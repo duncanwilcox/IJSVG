@@ -65,29 +65,57 @@
                     rect:(NSRect)rect
 {
     // grab the start and end point
-    CGPoint aStartPoint = (CGPoint){
-        .x = [self.x1 computeValue:rect.size.width],
-        .y = [self.y1 computeValue:rect.size.height]
-    };
+    CGPoint aStartPoint = CGPointZero;
+    CGPoint aEndPoint = CGPointZero;
+    CGFloat parentXOffset = 0.f;
+    CGFloat parentYOffset = 0.f;
+    if(self.units == IJSVGUnitUserSpaceOnUse) {
+        parentXOffset = (rect.origin.x/rect.size.width);
+        parentYOffset = (rect.origin.y/rect.size.height);
+    }
     
-    CGPoint aEndPoint = (CGPoint){
-        .x = [self.x2 computeValue:rect.size.width],
-        .y = [self.y2 computeValue:rect.size.height]
-    };
+    // work out if its percentage
+    if(self.x1.type == IJSVGUnitLengthTypePercentage) {
+        aStartPoint = (CGPoint){
+            .x = self.x1.value-parentXOffset,
+            .y = self.y1.value-parentYOffset
+        };
+        aEndPoint = (CGPoint){
+            .x = self.x2.value-parentXOffset,
+            .y = self.y2.value-parentYOffset
+        };
+    } else {
+        aStartPoint = (CGPoint){
+            .x = (self.x1.value/rect.size.width)-parentXOffset,
+            .y = (self.y1.value/rect.size.height)-parentYOffset
+        };
+        aEndPoint = (CGPoint){
+            .x = (self.x2.value/rect.size.width)-parentXOffset,
+            .y = (self.y2.value/rect.size.height)-parentYOffset
+        };
+    }
     
     // convert the nsgradient to a CGGradient
     CGGradientRef gRef = [self CGGradient];
     
-    // apply transform for each point
-    for( IJSVGTransform * transform in self.transforms ) {
-        CGAffineTransform trans = transform.CGAffineTransform;
-        aStartPoint = CGPointApplyAffineTransform(aStartPoint, trans);
-        aEndPoint = CGPointApplyAffineTransform(aEndPoint, trans);
-    }
+//    // apply transform for each point
+//    for( IJSVGTransform * transform in self.transforms ) {
+//        CGAffineTransform trans = transform.CGAffineTransform;
+//        aStartPoint = CGPointApplyAffineTransform(aStartPoint, trans);
+//        aEndPoint = CGPointApplyAffineTransform(aEndPoint, trans);
+//    }
     
     // draw the gradient
     CGGradientDrawingOptions opt = kCGGradientDrawsBeforeStartLocation|kCGGradientDrawsAfterEndLocation;
     CGContextDrawLinearGradient(ctx, gRef, aStartPoint, aEndPoint, opt);
+    
+    NSRect r = NSZeroRect;
+    r.origin = aStartPoint;
+    r.size = NSMakeSize(2.f, 2.f);
+    CGContextFillRect(ctx, r);
+    
+    r.origin = aEndPoint;
+    CGContextFillRect(ctx, r);    
 }
 
 @end

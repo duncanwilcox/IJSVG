@@ -36,7 +36,8 @@
     }
     
     // draw the gradient
-    [self.gradient drawInContextRef:ctx rect:self.bounds];
+    [self.gradient drawInContextRef:ctx
+                               rect:self.superlayer.frame];
 }
 
 @end

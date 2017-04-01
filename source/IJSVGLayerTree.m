@@ -398,6 +398,7 @@
     gradLayer.frame = CGPathGetBoundingBox(((IJSVGShapeLayer *)layer).path);
     gradLayer.gradient = gradient;
     gradLayer.mask = mask;
+    gradLayer.viewBox = self.viewBox;
     
     // is there a fill opacity?
     if(path.fillOpacity.value != 0.f) {

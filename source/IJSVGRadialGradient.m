@@ -45,34 +45,37 @@
                    startPoint:(CGPoint *)startPoint
                      endPoint:(CGPoint *)endPoint
 {
-    // cx defaults to 50% if not specified
-    NSDictionary * kv = @{@"cx":@"cx",
-                          @"cy":@"cy",
-                          @"r":@"radius",
-                          @"fx":@"fx"};
+    CGFloat cx = [element attributeForName:@"cx"].stringValue.floatValue;
+    CGFloat cy = [element attributeForName:@"cy"].stringValue.floatValue;
+    CGFloat radius = [element attributeForName:@"r"].stringValue.floatValue;
     
-    for(NSString * key in kv.allKeys) {
-        NSString * str = [element attributeForName:key].stringValue;
-        IJSVGUnitLength * unit = nil;
-        if(str != nil) {
-            unit = [IJSVGUnitLength unitWithPercentageString:str];
-        } else {
-            unit = [IJSVGUnitLength unitWithPercentageFloat:50];
-        }
-        [gradient setValue:unit
-                    forKey:kv[key]];
+    // work out each coord, and work out if its a % or not
+    // check all against all
+    BOOL isPercent = NO;
+    if(cx <= 1.f && cy <= 1.f && radius <= 1.f) {
+        isPercent = YES;
+    } else if((cx >= 0.f && cx <= 1.f) && (cy >= 0.f && cy <= 1.f) &&
+              (radius >= 0.f && radius <= 1.f)) {
+        isPercent = YES;
     }
     
-    // fy defaults to cy if not specified
-    NSString * fy = [element attributeForName:@"fy"].stringValue;
-    if(fy != nil) {
-        gradient.fy = [IJSVGUnitLength unitWithPercentageString:fy];
+    if(isPercent == NO) {
+        // just unit value
+        gradient.cx = [IJSVGGradientUnitLength unitWithString:[element attributeForName:@"cx"].stringValue];
+        gradient.cy = [IJSVGGradientUnitLength unitWithString:[element attributeForName:@"cy"].stringValue];
+        gradient.radius = [IJSVGGradientUnitLength unitWithString:[element attributeForName:@"r"].stringValue];
     } else {
-        gradient.fy = gradient.cy;
+        // make sure its a percent
+        gradient.cx = [IJSVGGradientUnitLength unitWithPercentageString:[element attributeForName:@"cx"].stringValue];
+        gradient.cy = [IJSVGGradientUnitLength unitWithPercentageString:[element attributeForName:@"cy"].stringValue];
+        gradient.radius = [IJSVGGradientUnitLength unitWithPercentageString:[element attributeForName:@"r"].stringValue];
     }
     
-    if( gradient.gradient != nil )
+    
+    // check for nullability
+    if( gradient.gradient != nil ) {
         return nil;
+    }
     
     *startPoint = CGPointMake(gradient.cx.valueAsPercentage, gradient.cy.valueAsPercentage);
     *endPoint = CGPointMake(gradient.fx.valueAsPercentage, gradient.fy.valueAsPercentage);

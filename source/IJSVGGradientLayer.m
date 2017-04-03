@@ -8,6 +8,7 @@
 
 #import "IJSVGGradientLayer.h"
 #import "IJSVGLinearGradient.h"
+#import "IJSVGRadialGradient.h"
 
 @implementation IJSVGGradientLayer
 
@@ -38,7 +39,11 @@
 
     CGRect boundingBoxRect = self.frame;
     CGRect objectRect = self.superlayer.frame;
+    CGPoint absolutePosition = ((IJSVGLayer *)self.superlayer).absoluteOrigin;
+    
+    BOOL isUserSpace = NO;
     if(self.gradient.units == IJSVGUnitUserSpaceOnUse) {
+        isUserSpace = YES;
         boundingBoxRect = self.viewBox;
     }
     
@@ -67,8 +72,7 @@
         if(self.gradient.x2.type == IJSVGUnitLengthTypePercentage) {
             
             // move origin back due to user space
-            if(self.gradient.units == IJSVGUnitUserSpaceOnUse) {
-                CGPoint absolutePosition = self.absoluteOrigin;
+            if(isUserSpace == YES) {
                 absolutePosition.x = (absolutePosition.x/CGRectGetWidth(boundingBoxRect));
                 absolutePosition.y = (absolutePosition.y/CGRectGetHeight(boundingBoxRect));
                 
@@ -85,7 +89,7 @@
             }
             
             // conver the points
-            if(self.gradient.units == IJSVGUnitUserSpaceOnUse) {
+            if(isUserSpace == YES) {
                 
                 // start
                 startPoint.x = ((startPoint.x - CGRectGetMinX(objectRect))/CGRectGetWidth(objectRect));
@@ -106,7 +110,7 @@
         } else {
             
             // move the origin to the user space
-            if(self.gradient.units == IJSVGUnitUserSpaceOnUse) {
+            if(isUserSpace == YES) {
                 CGPoint absolutePosition = self.absoluteOrigin;
                 
                 // apply the absolute transform
@@ -125,8 +129,73 @@
         // draw the gradient
         CGContextDrawLinearGradient(ctx, self.gradient.CGGradient,
                                     startPoint, endPoint, options);
-        
+     
+        // do nothing more
+        return;
     }
+    
+    // radial gradient
+    IJSVGRadialGradient * radialGradient = (IJSVGRadialGradient *)self.gradient;
+    CGFloat radius = 0.f;
+        
+    startPoint = (CGPoint) {
+        .x = radialGradient.cx.value,
+        .y = radialGradient.cy.value
+    };
+    
+    radius = radialGradient.radius.value;
+    CGPoint gradientPoint = CGPointZero;
+    
+    if(radialGradient.cx.type == IJSVGUnitLengthTypePercentage) {
+        
+    } else {
+        if(isUserSpace == YES) {
+            
+            CGRect rect = (CGRect) {
+                .origin = startPoint,
+                .size = (CGSize) {
+                    .width = radius*2,
+                    .height = radius*2
+                }
+            };
+            
+            // apply the absolute transform
+            CGAffineTransform transform;
+            transform = CGAffineTransformMakeTranslation(-absolutePosition.x,
+                                                         -absolutePosition.y);
+            
+            rect = CGRectApplyAffineTransform(rect, transform);
+            
+            // apply the transforms
+            for(IJSVGTransform * gradientTransform in self.gradient.transforms) {
+                rect = CGRectApplyAffineTransform(rect, gradientTransform.CGAffineTransform);
+            }
+            radius = CGRectGetHeight(rect)/2.f;
+        }
+        
+        // apply the transforms
+        gradientPoint = startPoint;
+        for(IJSVGTransform * gradientTransform in self.gradient.transforms) {
+            gradientPoint = CGPointApplyAffineTransform(gradientPoint, gradientTransform.CGAffineTransform);
+        }
+        
+        if(isUserSpace == YES) {
+            CGAffineTransform transform;
+            transform = CGAffineTransformMakeTranslation(-absolutePosition.x,
+                                                         -absolutePosition.y);
+            gradientPoint = CGPointApplyAffineTransform(startPoint, transform);
+            gradientPoint.x -= CGRectGetMinX(objectRect);
+            gradientPoint.y -= CGRectGetMinY(objectRect);
+        }
+    }
+    
+    // draw the gradient
+    CGGradientDrawingOptions options = kCGGradientDrawsBeforeStartLocation|
+        kCGGradientDrawsAfterEndLocation;
+    CGContextDrawRadialGradient(ctx, self.gradient.CGGradient, gradientPoint, 0.f,
+                                gradientPoint, radius, options);
+    
+    
 }
 
 @end

@@ -39,6 +39,7 @@
 		59A11E6C19B89CEA00E44498 /* SVGExampleView1.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A11E6B19B89CEA00E44498 /* SVGExampleView1.m */; };
 		59A11E6F19B89D2000E44498 /* SVGExampleView2.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A11E6E19B89D2000E44498 /* SVGExampleView2.m */; };
 		59A11E7219B89D6600E44498 /* SVGExampleView3.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A11E7119B89D6600E44498 /* SVGExampleView3.m */; };
+		59A2AE991E922FF700084CE0 /* IJSVGGradientUnitLength.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A2AE981E922FF700084CE0 /* IJSVGGradientUnitLength.m */; };
 		59A3DA6D1E283022003E59A9 /* IJSVGTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A3DA6C1E283022003E59A9 /* IJSVGTransaction.m */; };
 		59B93C6D19B7D1840063E823 /* paperplane.svg in Resources */ = {isa = PBXBuildFile; fileRef = 59B93C6C19B7D1840063E823 /* paperplane.svg */; };
 		59B93C6F19B7D32C0063E823 /* products.svg in Resources */ = {isa = PBXBuildFile; fileRef = 59B93C6E19B7D32C0063E823 /* products.svg */; };
@@ -150,6 +151,8 @@
 		59A11E6E19B89D2000E44498 /* SVGExampleView2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVGExampleView2.m; sourceTree = "<group>"; };
 		59A11E7019B89D6600E44498 /* SVGExampleView3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVGExampleView3.h; sourceTree = "<group>"; };
 		59A11E7119B89D6600E44498 /* SVGExampleView3.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVGExampleView3.m; sourceTree = "<group>"; };
+		59A2AE971E922FF700084CE0 /* IJSVGGradientUnitLength.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IJSVGGradientUnitLength.h; sourceTree = "<group>"; };
+		59A2AE981E922FF700084CE0 /* IJSVGGradientUnitLength.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJSVGGradientUnitLength.m; sourceTree = "<group>"; };
 		59A3DA6B1E283022003E59A9 /* IJSVGTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IJSVGTransaction.h; sourceTree = "<group>"; };
 		59A3DA6C1E283022003E59A9 /* IJSVGTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJSVGTransaction.m; sourceTree = "<group>"; };
 		59B93C6C19B7D1840063E823 /* paperplane.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = paperplane.svg; sourceTree = "<group>"; };
@@ -335,6 +338,8 @@
 		59E2641A19BA240D008A6FDB /* source */ = {
 			isa = PBXGroup;
 			children = (
+				59A2AE971E922FF700084CE0 /* IJSVGGradientUnitLength.h */,
+				59A2AE981E922FF700084CE0 /* IJSVGGradientUnitLength.m */,
 				59A3DA6B1E283022003E59A9 /* IJSVGTransaction.h */,
 				59A3DA6C1E283022003E59A9 /* IJSVGTransaction.m */,
 				598759F41E242C850024CC3F /* IJSVGExporterPathInstruction.h */,
@@ -557,6 +562,7 @@
 				5986308A19BA106D00CF15EA /* SVGExampleView5.m in Sources */,
 				59E2645619BA240D008A6FDB /* IJSVGCommandArc.m in Sources */,
 				59E8ABF91E219C860032A80C /* IJSVGMath.m in Sources */,
+				59A2AE991E922FF700084CE0 /* IJSVGGradientUnitLength.m in Sources */,
 				59265CEB1C4F843E00F333F0 /* SVGExampleView6.m in Sources */,
 				5941DAFE1CF9BC9B00B3A911 /* IJSVGPattern.m in Sources */,
 				59E8ABF01E211EDB0032A80C /* IJSVGShapeLayer.m in Sources */,

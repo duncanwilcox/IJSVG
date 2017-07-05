@@ -43,7 +43,10 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)();
     CGFloat _clipScale;
     id<IJSVGDelegate> _delegate;
     IJSVGLayer * _layerTree;
+    CGRect _layerViewBox;
     CGRect _viewBox;
+    CGRect _originalViewBox;
+    CGSize _originalProposedViewSize;
     CGSize _proposedViewSize;
     CGFloat _lastProposedBackingScale;
     
@@ -63,6 +66,7 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)();
 
 // global overwriting rules for when rendering an SVG, this will overide any
 // fillColor, strokeColor, pattern and gradient fill
+@property (nonatomic, assign) BOOL autoCalculatesViewBox;
 @property (nonatomic, retain) NSColor * fillColor;
 @property (nonatomic, retain) NSColor * strokeColor;
 @property (nonatomic, assign) CGFloat strokeWidth;

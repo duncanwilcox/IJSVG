@@ -87,6 +87,7 @@
             // make sure we apply the transform to the parent
             // so they stack
             IJSVGGroupLayer * childLayer = [[[IJSVGGroupLayer alloc] init] autorelease];
+            childLayer.isTransformationGroup = YES;
             childLayer.affineTransform = transform.CGAffineTransform;
             
             // add it to the parent layer
@@ -276,7 +277,8 @@
     // stroke it
     if(path.strokeColor != nil ||
        path.strokePattern != nil ||
-       path.strokeGradient != nil) {
+       path.strokeGradient != nil ||
+       self.strokeWidth > 0.f) {
         
         // load the stroke layer
         IJSVGStrokeLayer * strokeLayer = [self strokeLayer:layer
@@ -526,6 +528,10 @@
         sColor = self.strokeColor;
     }
     
+    if(sColor == nil && self.strokeWidth > 0.f) {
+        sColor = NSColor.blackColor;
+    }
+    
     // stroke layer
     IJSVGStrokeLayer * strokeLayer = [[[IJSVGStrokeLayer alloc] init] autorelease];
     strokeLayer.path = layer.path;
@@ -571,6 +577,11 @@
     // dashing
     strokeLayer.lineDashPhase = path.strokeDashOffset.value;
     strokeLayer.lineDashPattern = [self lineDashPattern:path];
+    strokeLayer.bounds = CGPathGetPathBoundingBox(strokeLayer.path);
+    strokeLayer.bounds = NSInsetRect(strokeLayer.bounds, -(strokeLayer.lineWidth),
+                                     -(strokeLayer.lineWidth));
+    strokeLayer.position = CGPointMake(CGRectGetMidX(strokeLayer.bounds),
+                                       CGRectGetMidY(strokeLayer.bounds));
     
     return strokeLayer;
 }

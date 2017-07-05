@@ -12,6 +12,7 @@
 
 @implementation IJSVG
 
+@synthesize autoCalculatesViewBox;
 @synthesize fillColor;
 @synthesize strokeColor;
 @synthesize strokeWidth;
@@ -116,7 +117,7 @@
     if((self = [super init]) != nil) {
         // keep the layer tree
         _layerTree = [group retain];
-        _viewBox = viewBox;
+        _viewBox = _originalViewBox = viewBox;
         
         // any setups
         [self _setupBasicsFromAnyInitializer];
@@ -324,8 +325,8 @@
 - (void)_setupBasicInfoFromGroup
 {
     // store the viewbox
-    _viewBox = _group.viewBox;
-    _proposedViewSize = _group.proposedViewSize;
+    _viewBox = _originalViewBox = _group.viewBox;
+    _proposedViewSize = _originalProposedViewSize = _group.proposedViewSize;
 }
 
 - (void)_setupBasicsFromAnyInitializer
@@ -687,6 +688,18 @@
     [_layerTree release], _layerTree = nil;
 }
 
+- (void)setAutoCalculatesViewBox:(BOOL)flag
+{
+    autoCalculatesViewBox = flag;
+    
+    // swap these back over
+    if(autoCalculatesViewBox == NO) {
+        _viewBox = _originalViewBox;
+        _proposedViewSize = _originalProposedViewSize;
+    }
+    [_layerTree release], _layerTree = nil;
+}
+
 - (IJSVGLayer *)layerWithTree:(IJSVGLayerTree *)tree
 {
     // clear memory
@@ -698,7 +711,32 @@
     IJSVGBeginTransactionLock();
     _layerTree = [[tree layerForNode:_group] retain];
     IJSVGEndTransactionLock();
+    
+    // make sure we calculate the viewbox if required
+    if(self.autoCalculatesViewBox == YES) {
+        NSRect viewBox;
+        [self computeActualViewBox:_layerTree viewBox:&viewBox];
+        _viewBox = viewBox;
+        _proposedViewSize = viewBox.size;
+    }
+    
     return _layerTree;
+}
+
+- (void)computeActualViewBox:(IJSVGLayer *)tree
+                     viewBox:(NSRect *)viewBox
+{
+    __block CGRect rect = tree.bounds;
+    void (^__block findFrameUnion)(IJSVGLayer * layer) = ^(IJSVGLayer * layer) {
+        for(IJSVGLayer * sublayer in layer.sublayers) {
+            CGRect r = sublayer.frame;
+            r.origin = sublayer.absoluteOrigin;
+            rect = CGRectUnion(rect, r);
+            findFrameUnion(sublayer);
+        }
+    };
+    findFrameUnion(tree);
+    *viewBox = rect;
 }
 
 - (IJSVGLayer *)layer
@@ -710,7 +748,6 @@
     // create the renderer and assign default values
     // from this SVG object
     IJSVGLayerTree * renderer = [[[IJSVGLayerTree alloc] init] autorelease];
-    renderer.viewBox = self.viewBox;
     renderer.fillColor = self.fillColor;
     renderer.strokeColor = self.strokeColor;
     renderer.strokeWidth = self.strokeWidth;
@@ -726,8 +763,14 @@
     // in order to correctly fit the the SVG into the
     // rect, we need to work out the ratio scale in order
     // to transform the paths into our viewbox
-    NSSize dest = rect.size;
+    
+    // force layer creation is...autocalculate is turned on
+    if(self.autoCalculatesViewBox == YES) {
+        [self layer];
+    }
+    
     NSSize source = _viewBox.size;
+    NSSize dest = rect.size;
     _clipScale = MIN(dest.width/_proposedViewSize.width,
                      dest.height/_proposedViewSize.height);
    

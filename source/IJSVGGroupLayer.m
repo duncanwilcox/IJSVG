@@ -10,4 +10,6 @@
 
 @implementation IJSVGGroupLayer
 
+@synthesize isTransformationGroup;
+
 @end

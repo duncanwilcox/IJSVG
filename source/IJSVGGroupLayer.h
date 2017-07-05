@@ -12,4 +12,6 @@
 
 @interface IJSVGGroupLayer : IJSVGLayer
 
+@property (nonatomic, assign) BOOL isTransformationGroup;
+
 @end

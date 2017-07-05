@@ -13,6 +13,7 @@
 @class IJSVGGradientLayer;
 @class IJSVGPatternLayer;
 @class IJSVGStrokeLayer;
+@class IJSVGGroupLayer;
 
 #define IJSVG_LAYER_ADD_SUBVIEW_DEFAULT_IMPLEMENTATION \
 - (void)addSublayer:(CALayer *)layer { \
@@ -57,6 +58,11 @@
     CGPoint point = CGPointZero; \
     CALayer * pLayer = self; \
     while(pLayer != nil) { \
+        if([pLayer isKindOfClass:[IJSVGGroupLayer class]] && \
+            pLayer.isTransformationGroup == YES) { \
+            pLayer = pLayer.superlayer; \
+            continue; \
+        } \
         point.x += pLayer.frame.origin.x; \
         point.y += pLayer.frame.origin.y; \
         pLayer = pLayer.superlayer; \

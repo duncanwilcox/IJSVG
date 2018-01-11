@@ -385,6 +385,8 @@
                    flipped:(BOOL)flipped
                      error:(NSError **)error
 {
+    assert(NSThread.isMainThread);
+
     NSImage * im = [[NSImage alloc] initWithSize:aSize];
     [im lockFocus];
     CGContextRef ref = [[NSGraphicsContext currentContext] graphicsPort];

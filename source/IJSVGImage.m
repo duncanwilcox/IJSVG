@@ -26,6 +26,7 @@
 
 - (void)loadFromBase64EncodedString:(NSString *)encodedString
 {
+    assert(NSThread.isMainThread);
     NSURL * URL = [NSURL URLWithString:encodedString];
     NSData * data = [NSData dataWithContentsOfURL:URL];
     
@@ -52,10 +53,7 @@
 
 - (void)setImage:(NSImage *)anImage
 {
-    if(self.image != nil) {
-         self.image = nil;
-    }
-    self.image = anImage;
+    _image = anImage;
     
     if(self.CGImage != nil) {
         CGImageRelease(self.CGImage);
@@ -69,11 +67,6 @@
     
     // be sure to retain (some reason this is required in Xcode 8 beta 5?)
     CGImageRetain(self.CGImage);
-}
-
-- (CGImageRef)CGImage
-{
-    return self.CGImage;
 }
 
 - (void)drawInContextRef:(CGContextRef)context

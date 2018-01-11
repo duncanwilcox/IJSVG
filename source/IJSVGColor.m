@@ -13,7 +13,6 @@
 
 static NSMutableDictionary * _colorTree = nil;
 
-
 + (void)load
 {
     [[self class] _generateTree];

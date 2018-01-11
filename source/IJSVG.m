@@ -21,12 +21,12 @@
 
 - (void)dealloc
 {
-    [renderingBackingScaleHelper release], renderingBackingScaleHelper = nil;
-    [fillColor release], fillColor = nil;
-    [strokeColor release], strokeColor = nil;
-    [_group release], _group = nil;
-    [_layerTree release], _layerTree = nil;
-    [_replacementColors release], _replacementColors = nil;
+    [renderingBackingScaleHelper release]; renderingBackingScaleHelper = nil;
+    [fillColor release]; fillColor = nil;
+    [strokeColor release]; strokeColor = nil;
+    [_group release]; _group = nil;
+    [_layerTree release]; _layerTree = nil;
+    [_replacementColors release]; _replacementColors = nil;
     [super dealloc];
 }
 
@@ -252,7 +252,7 @@
             if( error != NULL ) {
                 *error = anError;
             }
-            [self release], self = nil;
+            [self release]; self = nil;
             return nil;
         }
         
@@ -306,7 +306,7 @@
             if(error != NULL) {
                 *error = anError;
             }
-            [self release], self = nil;
+            [self release]; self = nil;
             return nil;
         }
     }
@@ -320,7 +320,7 @@
     [self layer];
     
     // now clear memory
-    [_group release], _group = nil;
+    [_group release]; _group = nil;
 }
 
 - (void)_setupBasicInfoFromGroup
@@ -676,44 +676,44 @@
 - (void)setFillColor:(NSColor *)aColor
 {
     if(fillColor != nil) {
-        [fillColor release], fillColor = nil;
+        [fillColor release]; fillColor = nil;
     }
     fillColor = [aColor retain];
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (void)setStrokeColor:(NSColor *)aColor
 {
     if(strokeColor != nil) {
-        [strokeColor release], strokeColor = nil;
+        [strokeColor release]; strokeColor = nil;
     }
     strokeColor = [aColor retain];
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (void)setStrokeWidth:(CGFloat)aWidth
 {
     strokeWidth = aWidth;
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (void)setLineCapStyle:(IJSVGLineCapStyle)aLineCapStyle
 {
     lineCapStyle = aLineCapStyle;
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (void)setLineJoinStyle:(IJSVGLineJoinStyle)aLineJoinStyle
 {
     lineJoinStyle = aLineJoinStyle;
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (IJSVGLayer *)layerWithTree:(IJSVGLayerTree *)tree
 {
     // clear memory
     if(_layerTree != nil) {
-        [_layerTree release], _layerTree = nil;
+        [_layerTree release]; _layerTree = nil;
     }
     
     // force rebuild of the tree
@@ -779,7 +779,7 @@
 
 - (void)removeAllReplacementColors
 {
-    [_replacementColors release], _replacementColors = nil;
+    [_replacementColors release]; _replacementColors = nil;
 }
 
 - (void)removeReplacementColor:(NSColor *)color
@@ -799,13 +799,13 @@
     color = [IJSVGColor computeColorSpace:color];
     newColor = [IJSVGColor computeColorSpace:newColor];
     _replacementColors[color] = newColor;
-    [_layerTree release], _layerTree = nil;
+    [_layerTree release]; _layerTree = nil;
 }
 
 - (void)setReplacementColors:(NSDictionary<NSColor *, NSColor *> *)colors
 {
     if(_replacementColors != nil) {
-        [_replacementColors release], _replacementColors = nil;
+        [_replacementColors release]; _replacementColors = nil;
     }
     for(NSColor * oldColor in colors) {
         [self replaceColor:oldColor

@@ -13,7 +13,7 @@
 
 - (void)dealloc
 {
-    [_dict release], _dict = nil;
+    [_dict release]; _dict = nil;
     [super dealloc];
 }
 

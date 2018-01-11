@@ -36,9 +36,9 @@
 
 - (void)dealloc
 {
-    [fillColor release], fillColor = nil;
-    [strokeColor release], strokeColor = nil;
-    [replacementColors release], replacementColors = nil;
+    [fillColor release]; fillColor = nil;
+    [strokeColor release]; strokeColor = nil;
+    [replacementColors release]; replacementColors = nil;
     [super dealloc];
 }
 

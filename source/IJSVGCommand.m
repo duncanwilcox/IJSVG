@@ -25,9 +25,9 @@ static NSMutableDictionary * _classes = nil;
 
 - (void)dealloc
 {
-    [commandString release], commandString = nil;
-    [command release], command = nil;
-    [subCommands release], subCommands = nil;
+    [commandString release]; commandString = nil;
+    [command release]; command = nil;
+    [subCommands release]; subCommands = nil;
     free( parameters );
     [super dealloc];
 }

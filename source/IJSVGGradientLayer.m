@@ -14,7 +14,7 @@
 
 - (void)dealloc
 {
-    [gradient release], gradient = nil;
+    [gradient release]; gradient = nil;
     [super dealloc];
 }
 

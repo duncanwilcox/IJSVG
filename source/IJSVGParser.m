@@ -40,12 +40,12 @@
 
 - (void)dealloc
 {
-    [_glyphs release], _glyphs = nil;
-    [_styleSheet release], _styleSheet = nil;
-    [_parsedNodes release], _parsedNodes = nil;
-    [_defNodes release], _defNodes = nil;
-    [_baseDefNodes release], _baseDefNodes = nil;
-    [_svgs release], _svgs = nil;
+    [_glyphs release]; _glyphs = nil;
+    [_styleSheet release]; _styleSheet = nil;
+    [_parsedNodes release]; _parsedNodes = nil;
+    [_defNodes release]; _defNodes = nil;
+    [_baseDefNodes release]; _baseDefNodes = nil;
+    [_svgs release]; _svgs = nil;
     [super dealloc];
 }
 
@@ -101,14 +101,14 @@
         anError = nil;
         if( ![self _validateParse:&anError] ) {
             *error = anError;
-            [_document release], _document = nil;
-            [self release], self = nil;
+            [_document release]; _document = nil;
+            [self release]; self = nil;
             return nil;
         }
         
         // we have actually finished with the document at this point
         // so just get rid of it
-        [_document release], _document = nil;
+        [_document release]; _document = nil;
         
     }
     return self;
@@ -143,8 +143,8 @@
         *error = [[[NSError alloc] initWithDomain:IJSVGErrorDomain
                                              code:code
                                          userInfo:nil] autorelease];
-    [_document release], _document = nil;
-    [self release], self = nil;
+    [_document release]; _document = nil;
+    [self release]; self = nil;
     return nil;
 }
 
@@ -228,9 +228,9 @@
     }
     
     // dont need the style sheet or the parsed nodes as this point
-    [_styleSheet release], _styleSheet = nil;
-    [_parsedNodes release], _parsedNodes = nil;
-    [_defNodes release], _defNodes = nil;
+    [_styleSheet release]; _styleSheet = nil;
+    [_parsedNodes release]; _parsedNodes = nil;
+    [_defNodes release]; _defNodes = nil;
 }
 
 - (void)_postParseElementForCommonAttributes:(NSXMLElement *)element

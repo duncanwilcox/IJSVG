@@ -14,7 +14,7 @@
 
 - (void)dealloc
 {
-    [text release], text = nil;
+    [text release]; text = nil;
     [super dealloc];
 }
 

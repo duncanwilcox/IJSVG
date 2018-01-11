@@ -112,11 +112,11 @@ NSString * IJSVGHash(NSString * key) {
 
 - (void)dealloc
 {
-    [_scaledRootNode release], _scaledRootNode = nil;
-    [_svg release], _svg = nil;
-    [_dom release], _dom = nil;
-    [title release], title = nil;
-    [description release], description = nil;
+    [_scaledRootNode release]; _scaledRootNode = nil;
+    [_svg release]; _svg = nil;
+    [_dom release]; _dom = nil;
+    [title release]; title = nil;
+    [description release]; description = nil;
     [super dealloc];
 }
 

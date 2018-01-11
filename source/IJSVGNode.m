@@ -52,31 +52,31 @@
 - (void)dealloc
 {
     free(strokeDashArray);
-    [x release], x = nil;
-    [y release], y = nil;
-    [width release], width = nil;
-    [height release], height = nil;
-    [opacity release], opacity = nil;
-    [fillOpacity release], fillOpacity = nil;
-    [strokeOpacity release], strokeOpacity = nil;
-    [strokeWidth release], strokeWidth = nil;
-    [strokeDashOffset release], strokeDashOffset = nil;
-    [unicode release], unicode = nil;
-    [fillGradient release], fillGradient = nil;
-    [strokeGradient release], strokeGradient = nil;
-    [strokePattern release], strokePattern = nil;
-    [transforms release], transforms = nil;
-    [fillColor release], fillColor = nil;
-    [strokeColor release], strokeColor = nil;
-    [identifier release], identifier = nil;
-    [def release], def = nil;
-    [name release], name = nil;
-    [className release], className = nil;
-    [classNameList release], classNameList = nil;
-    [fillPattern release], fillPattern = nil;
-    [clipPath release], clipPath = nil;
-    [svg release], svg = nil;
-    [mask release], mask = nil;
+    [x release]; x = nil;
+    [y release]; y = nil;
+    [width release]; width = nil;
+    [height release]; height = nil;
+    [opacity release]; opacity = nil;
+    [fillOpacity release]; fillOpacity = nil;
+    [strokeOpacity release]; strokeOpacity = nil;
+    [strokeWidth release]; strokeWidth = nil;
+    [strokeDashOffset release]; strokeDashOffset = nil;
+    [unicode release]; unicode = nil;
+    [fillGradient release]; fillGradient = nil;
+    [strokeGradient release]; strokeGradient = nil;
+    [strokePattern release]; strokePattern = nil;
+    [transforms release]; transforms = nil;
+    [fillColor release]; fillColor = nil;
+    [strokeColor release]; strokeColor = nil;
+    [identifier release]; identifier = nil;
+    [def release]; def = nil;
+    [name release]; name = nil;
+    [className release]; className = nil;
+    [classNameList release]; classNameList = nil;
+    [fillPattern release]; fillPattern = nil;
+    [clipPath release]; clipPath = nil;
+    [svg release]; svg = nil;
+    [mask release]; mask = nil;
     [super dealloc];
 }
 

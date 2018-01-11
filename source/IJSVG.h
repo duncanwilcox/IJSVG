@@ -15,8 +15,8 @@
 
 @class IJSVG;
 
-void IJSVGBeginTransactionLock();
-void IJSVGEndTransactionLock();
+void IJSVGBeginTransactionLock(void);
+void IJSVGEndTransactionLock(void);
 void IJSVGObtainTransactionLock(dispatch_block_t block, BOOL renderOnMainThread);
 
 @protocol IJSVGDelegate <NSObject,IJSVGParserDelegate>
@@ -33,7 +33,7 @@ withSVGString:(NSString *)subSVGString;
 
 @end
 
-typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)();
+typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 
 @interface IJSVG : NSObject <NSPasteboardWriting, IJSVGParserDelegate> {
     

@@ -14,10 +14,10 @@
 
 - (void)dealloc
 {
-    [classes release], classes = nil;
-    [identifier release], identifier = nil;
-    [tag release], tag = nil;
-    [combinatorString release], combinatorString = nil;
+    [classes release]; classes = nil;
+    [identifier release]; identifier = nil;
+    [tag release]; tag = nil;
+    [combinatorString release]; combinatorString = nil;
     [super dealloc];
 }
 

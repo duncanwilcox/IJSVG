@@ -8,6 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-void IJSVGBeginTransactionLock();
-void IJSVGEndTransactionLock();
+void IJSVGBeginTransactionLock(void);
+void IJSVGEndTransactionLock(void);
 void IJSVGObtainTransactionLock(dispatch_block_t block, BOOL renderOnMainThread);

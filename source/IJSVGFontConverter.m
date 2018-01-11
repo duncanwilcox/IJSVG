@@ -13,9 +13,9 @@
 
 - (void)dealloc
 {
-    [_paths release], _paths = nil;
-    [_url release], _url = nil;
-    [_font release], _font = nil;
+    [_paths release]; _paths = nil;
+    [_url release]; _url = nil;
+    [_font release]; _font = nil;
     [super dealloc];
 }
 

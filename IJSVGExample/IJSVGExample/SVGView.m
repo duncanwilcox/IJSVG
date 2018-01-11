@@ -13,7 +13,7 @@
 
 - (void)dealloc
 {
-    [svg release], svg = nil;
+    [svg release]; svg = nil;
     [super dealloc];
 }
 

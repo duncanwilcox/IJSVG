@@ -15,8 +15,8 @@
 
 - (void)dealloc
 {
-    [pattern release], pattern = nil;
-    [patternNode release], patternNode = nil;
+    [pattern release]; pattern = nil;
+    [patternNode release]; patternNode = nil;
     [super dealloc];
 }
 

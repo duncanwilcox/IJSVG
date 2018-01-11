@@ -12,7 +12,7 @@
 
 - (void)dealloc
 {
-    [children release], children = nil;
+    [children release]; children = nil;
     [super dealloc];
 }
 

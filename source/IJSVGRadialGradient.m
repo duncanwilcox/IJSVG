@@ -18,11 +18,11 @@
 
 - (void)dealloc
 {
-    [cx release], cx = nil;
-    [cy release], cy = nil;
-    [fx release], fx = nil;
-    [fy release], fy = nil;
-    [radius release], radius = nil;
+    [cx release]; cx = nil;
+    [cy release]; cy = nil;
+    [fx release]; fx = nil;
+    [fy release]; fy = nil;
+    [radius release]; radius = nil;
     [super dealloc];
 }
 

@@ -16,11 +16,11 @@
 
 - (void)dealloc
 {
-    [x1 release], x1 = nil;
-    [x2 release], x2 = nil;
-    [y1 release], y1 = nil;
-    [y2 release], y2 = nil;
-    [gradient release], gradient = nil;
+    [x1 release]; x1 = nil;
+    [x2 release]; x2 = nil;
+    [y1 release]; y1 = nil;
+    [y2 release]; y2 = nil;
+    [gradient release]; gradient = nil;
     if( CGGradient != nil ) {
         CGGradientRelease(CGGradient);
     }

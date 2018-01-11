@@ -24,7 +24,7 @@
 - (void)dealloc
 {
     IJSVGBeginTransactionLock();
-    [_maskingLayer release], _maskingLayer = nil;
+    [_maskingLayer release]; _maskingLayer = nil;
     [super dealloc];
     IJSVGEndTransactionLock();
 }
@@ -75,13 +75,13 @@
     convertMasksToPaths = flag;
     if(flag == YES) {
         if(_maskingLayer != nil) {
-            [_maskingLayer release], _maskingLayer = nil;
+            [_maskingLayer release]; _maskingLayer = nil;
         }
         _maskingLayer = [(IJSVGLayer *)self.mask retain];
         self.mask = nil;
     } else {
         self.mask = _maskingLayer;
-        [_maskingLayer release], _maskingLayer = nil;
+        [_maskingLayer release]; _maskingLayer = nil;
     }
 }
 

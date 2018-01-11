@@ -14,9 +14,9 @@
 
 - (void)dealloc
 {
-    CGImageRelease(CGImage), CGImage = nil;
-    [imagePath release], imagePath = nil;
-    [image release], image = nil;
+    CGImageRelease(CGImage); CGImage = nil;
+    [imagePath release]; imagePath = nil;
+    [image release]; image = nil;
     [super dealloc];
 }
 
@@ -49,7 +49,7 @@
 - (void)setImage:(NSImage *)anImage
 {
     if(image != nil) {
-        [image release], image = nil;
+        [image release]; image = nil;
     }
     image = [anImage retain];
     

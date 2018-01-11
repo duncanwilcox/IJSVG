@@ -21,14 +21,7 @@ typedef NS_OPTIONS( NSInteger, IJSVGTransformCommand ) {
     IJSVGTransformCommandNotImplemented
 };
 
-@interface IJSVGTransform : NSObject {
-    
-    IJSVGTransformCommand command;
-    CGFloat * parameters;
-    NSInteger parameterCount;
-    NSInteger sort;
-    
-}
+@interface IJSVGTransform : NSObject
 
 @property ( nonatomic, assign ) IJSVGTransformCommand command;
 @property ( nonatomic, assign ) CGFloat * parameters;

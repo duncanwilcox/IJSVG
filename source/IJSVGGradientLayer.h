@@ -11,10 +11,8 @@
 #import "IJSVGPath.h"
 #import "IJSVGLayer.h"
 
-@interface IJSVGGradientLayer : IJSVGLayer {
-    
-}
+@interface IJSVGGradientLayer : IJSVGLayer
 
-@property (nonatomic, retain) IJSVGGradient * gradient;
+@property (nonatomic, strong) IJSVGGradient * gradient;
 
 @end

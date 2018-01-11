@@ -11,14 +11,7 @@
 
 @class IJSVGNode;
 
-@interface IJSVGStyleSheetSelector : NSObject {
-    
-    NSString * selector;
-    NSUInteger specificity;
-@private
-    NSMutableArray * _rawSelectors;
-    
-}
+@interface IJSVGStyleSheetSelector : NSObject
 
 @property (nonatomic, assign) NSUInteger specificity;
 

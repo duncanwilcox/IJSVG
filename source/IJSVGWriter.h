@@ -9,9 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "IJSVGPath.h"
 
-@interface IJSVGWriter : NSObject {
-    
-}
+@interface IJSVGWriter : NSObject
 
 + (NSString *)SVGDocumentStringForSVGGlyph:(IJSVGPath *)node;
 + (NSString *)SVGDocumentStringForBezierPath:(NSBezierPath *)path;

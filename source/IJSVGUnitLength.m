@@ -10,13 +10,9 @@
 
 @implementation IJSVGUnitLength
 
-@synthesize value;
-@synthesize type;
-@synthesize inherit;
-
 + (IJSVGUnitLength *)unitWithFloat:(CGFloat)number
 {
-    IJSVGUnitLength * unit = [[[self alloc] init] autorelease];
+    IJSVGUnitLength * unit = [[self alloc] init];
     unit.value = number;
     unit.type = IJSVGUnitLengthTypeNumber;
     return unit;
@@ -25,7 +21,7 @@
 + (IJSVGUnitLength *)unitWithFloat:(CGFloat)number
                               type:(IJSVGUnitLengthType)type
 {
-    IJSVGUnitLength * unit = [[[self alloc] init] autorelease];
+    IJSVGUnitLength * unit = [[self alloc] init];
     unit.value = number;
     unit.type = type;
     return unit;
@@ -52,7 +48,7 @@
         return nil;
     }
     
-    IJSVGUnitLength * unit = [[[self alloc] init] autorelease];
+    IJSVGUnitLength * unit = [[self alloc] init];
     unit.value = [string floatValue];
     unit.type = IJSVGUnitLengthTypeNumber;
     if([string hasSuffix:@"%"] == YES) {

@@ -9,12 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "IJSVGColor.h"
 
-@interface IJSVGStyle : NSObject {
-    
-@private
-    NSMutableDictionary * _dict;
-    
-}
+@interface IJSVGStyle : NSObject
 
 + (IJSVGStyle *)parseStyleString:(NSString *)string;
 

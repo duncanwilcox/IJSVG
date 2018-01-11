@@ -8,18 +8,16 @@
 
 #import "IJSVGDef.h"
 
-@implementation IJSVGDef
+@interface IJSVGDef ()
+@property (nonatomic, strong) NSMutableDictionary *dict;
+@end
 
-- (void)dealloc
-{
-    [_dict release]; _dict = nil;
-    [super dealloc];
-}
+@implementation IJSVGDef
 
 - (id)init
 {
     if( ( self = [super initWithDef:NO] ) != nil ) {
-        _dict = [[NSMutableDictionary alloc] init];
+        self.dict = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -29,13 +27,13 @@
     if( aDef.identifier == nil ) {
         return;
     }
-    [_dict setObject:aDef
+    [self.dict setObject:aDef
               forKey:aDef.identifier];
 }
 
 - (IJSVGDef *)defForID:(NSString *)anID
 {
-    return [_dict objectForKey:anID];
+    return [self.dict objectForKey:anID];
 }
 
 @end

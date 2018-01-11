@@ -360,7 +360,7 @@ CGFloat degrees_to_radians( CGFloat degrees )
 + (void)logParameters:(CGFloat *)param
                 count:(NSInteger)count
 {
-    NSMutableString * str = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString * str = [[NSMutableString alloc] init];
     for( NSInteger i = 0; i < count; i++ )
     {
         [str appendFormat:@"%f ",param[i]];

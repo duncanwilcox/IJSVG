@@ -9,27 +9,26 @@
 #import "IJSVGCommand.h"
 #import "IJSVGUtils.h"
 
-@implementation IJSVGCommand
+@interface IJSVGCommand ()
+//    NSString * commandString;
+//    NSString * command;
+//    CGFloat * parameters;
+//    NSInteger parameterCount;
+//    NSMutableArray * subCommands;
+//    NSInteger requiredParameters;
+//    IJSVGCommandType type;
+//    IJSVGCommand * __weak previousCommand;
+//    Class<IJSVGCommandProtocol> commandClass;
+@property (nonatomic, assign) NSInteger currentIndex;
+@end
 
-@synthesize commandString;
-@synthesize command;
-@synthesize parameterCount;
-@synthesize parameters;
-@synthesize subCommands;
-@synthesize commandClass;
-@synthesize requiredParameters;
-@synthesize type;
-@synthesize previousCommand;
+@implementation IJSVGCommand
 
 static NSMutableDictionary * _classes = nil;
 
 - (void)dealloc
 {
-    [commandString release]; commandString = nil;
-    [command release]; command = nil;
-    [subCommands release]; subCommands = nil;
-    free( parameters );
-    [super dealloc];
+    free(self.parameters);
 }
 
 - (id)initWithCommandString:(NSString *)str
@@ -37,13 +36,15 @@ static NSMutableDictionary * _classes = nil;
     if( ( self = [super init] ) != nil )
     {
         // work out the basics
-        _currentIndex = 0;
-        subCommands = [[NSMutableArray alloc] init];
-        command = [[str substringToIndex:1] copy];
-        type = [IJSVGUtils typeForCommandString:self.command];
-        commandClass = [[self class] commandClassForCommandLetter:self.command];
-        parameters = [IJSVGUtils commandParameters:str count:&parameterCount];
-        requiredParameters = [self.commandClass requiredParameterCount];
+        self.currentIndex = 0;
+        self.subCommands = [[NSMutableArray alloc] init];
+        self.command = [[str substringToIndex:1] copy];
+        self.type = [IJSVGUtils typeForCommandString:self.command];
+        self.commandClass = [[self class] commandClassForCommandLetter:self.command];
+        NSInteger cnt = 0;
+        self.parameters = [IJSVGUtils commandParameters:str count:&cnt];
+        self.parameterCount = cnt;
+        self.requiredParameters = [self.commandClass requiredParameterCount];
         
         // now work out the sets of parameters we have
         // each command could have a series of subcommands
@@ -66,7 +67,7 @@ static NSMutableDictionary * _classes = nil;
             }
             
             // create a subcommand per set
-            IJSVGCommand * c = [[[[self class] alloc] init] autorelease];
+            IJSVGCommand * c = [[[self class] alloc] init];
             c.parameterCount = self.requiredParameters;
             c.parameters = subParams;
             c.type = self.type;
@@ -118,16 +119,16 @@ static NSMutableDictionary * _classes = nil;
 
 - (CGFloat)readFloat
 {
-    CGFloat f = parameters[_currentIndex];
-    _currentIndex++;
+    CGFloat f = self.parameters[self.currentIndex];
+    self.currentIndex++;
     return f;
 }
 
 - (NSPoint)readPoint
 {
-    CGFloat x = parameters[_currentIndex];
-    CGFloat y = parameters[_currentIndex+1];
-    _currentIndex+=2;
+    CGFloat x = self.parameters[self.currentIndex];
+    CGFloat y = self.parameters[self.currentIndex+1];
+    self.currentIndex+=2;
     return NSMakePoint( x, y );
 }
 

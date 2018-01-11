@@ -11,31 +11,23 @@
 #import "IJSVGGroupLayer.h"
 #import "IJSVG.h"
 
+@interface IJSVGLayer ()
+@property (nonatomic, strong) IJSVGLayer *maskingLayerInternal;
+@end
 
 @implementation IJSVGLayer
-
-@synthesize gradientFillLayer;
-@synthesize patternFillLayer;
-@synthesize gradientStrokeLayer;
-@synthesize patternStrokeLayer;
-@synthesize strokeLayer;
-@synthesize requiresBackingScaleHelp;
-@synthesize backingScaleFactor;
-@synthesize blendingMode;
-@synthesize convertMasksToPaths;
 
 - (void)dealloc
 {
     IJSVGBeginTransactionLock();
-    [_maskingLayer release]; _maskingLayer = nil;
-    [super dealloc];
+    self.maskingLayerInternal = nil;
     IJSVGEndTransactionLock();
 }
 
 
 + (NSArray *)deepestSublayersOfLayer:(CALayer *)layer
 {
-    NSMutableArray * arr = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * arr = [[NSMutableArray alloc] init];
     for(CALayer * subLayer in layer.sublayers) {
         if(subLayer.sublayers.count != 0) {
             NSArray * moreLayers = [self deepestSublayersOfLayer:(IJSVGLayer *)subLayer];
@@ -80,10 +72,10 @@
 
 - (void)setBackingScaleFactor:(CGFloat)newFactor 
 { 
-    if(self.backingScaleFactor == newFactor) { 
+    if(_backingScaleFactor == newFactor) {
         return; 
     } 
-    backingScaleFactor = newFactor; 
+    _backingScaleFactor = newFactor;
     self.contentsScale = newFactor; 
     self.rasterizationScale = newFactor; 
     [self setNeedsDisplay]; 
@@ -91,7 +83,7 @@
 
 - (void)_customRenderInContext:(CGContextRef)ctx 
 { 
-    if(self.convertMasksToPaths == YES && _maskingLayer != nil) {
+    if(self.convertMasksToPaths == YES && self.maskingLayerInternal != nil) {
         CGContextSaveGState(ctx); 
         [self applySublayerMaskToContext:ctx 
                              forSublayer:(IJSVGLayer *)self 
@@ -105,19 +97,19 @@
 
 - (void)setConvertMasksToPaths:(BOOL)flag 
 {
-    if(convertMasksToPaths == flag) { 
+    if(_convertMasksToPaths == flag) {
         return; 
     } 
-    convertMasksToPaths = flag; 
+    _convertMasksToPaths = flag;
     if(flag == YES) {
-        if(_maskingLayer != nil){
-            [_maskingLayer release]; _maskingLayer = nil;
+        if(self.maskingLayerInternal != nil){
+             self.maskingLayerInternal = nil;
         }
-        _maskingLayer = [(IJSVGLayer *)self.mask retain];
+        self.maskingLayerInternal = (IJSVGLayer *)self.mask;
         self.mask = nil; 
     } else { 
-        self.mask = _maskingLayer;
-        [_maskingLayer release]; _maskingLayer = nil;
+        self.mask = self.maskingLayerInternal;
+         self.maskingLayerInternal = nil;
     } 
 } 
 
@@ -163,7 +155,7 @@
 
 - (IJSVGShapeLayer *)maskingLayer
 { 
-    return (IJSVGShapeLayer *)_maskingLayer ?: nil;
+    return (IJSVGShapeLayer *)self.maskingLayerInternal ?: nil;
 } 
 
 - (void)renderInContext:(CGContextRef)ctx 
@@ -176,7 +168,7 @@
         return; 
     } 
     [self _customRenderInContext:ctx]; 
-} 
+}
 
 - (CGPoint)absoluteOrigin 
 {

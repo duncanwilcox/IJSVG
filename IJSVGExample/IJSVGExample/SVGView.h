@@ -9,12 +9,5 @@
 #import <Foundation/Foundation.h>
 #import "IJSVG.h"
 
-@interface SVGView : NSView {
- 
-    IJSVG * svg;
-    
-}
-
-
-
+@interface SVGView : NSView
 @end

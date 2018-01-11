@@ -35,26 +35,7 @@ withSVGString:(NSString *)subSVGString;
 
 typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 
-@interface IJSVG : NSObject <NSPasteboardWriting, IJSVGParserDelegate> {
-    
-@private
-    IJSVGParser * _group;
-    CGFloat _scale;
-    CGFloat _clipScale;
-    id<IJSVGDelegate> _delegate;
-    IJSVGLayer * _layerTree;
-    CGRect _viewBox;
-    CGSize _proposedViewSize;
-    CGFloat _lastProposedBackingScale;
-    NSMutableDictionary * _replacementColors;
-    
-    struct {
-        unsigned int shouldHandleForeignObject: 1;
-        unsigned int handleForeignObject: 1;
-        unsigned int shouldHandleSubSVG: 1;
-    } _respondsTo;
-    
-}
+@interface IJSVG : NSObject <NSPasteboardWriting, IJSVGParserDelegate>
 
 // set this to be called when the layer is about to draw, it will call this
 // and ask for the scale of the backing store where its going to be drawn
@@ -64,8 +45,8 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 
 // global overwriting rules for when rendering an SVG, this will overide any
 // fillColor, strokeColor, pattern and gradient fill
-@property (nonatomic, retain) NSColor * fillColor;
-@property (nonatomic, retain) NSColor * strokeColor;
+@property (nonatomic, strong) NSColor * fillColor;
+@property (nonatomic, strong) NSColor * strokeColor;
 @property (nonatomic, assign) CGFloat strokeWidth;
 @property (nonatomic, assign) IJSVGLineCapStyle lineCapStyle;
 @property (nonatomic, assign) IJSVGLineJoinStyle lineJoinStyle;

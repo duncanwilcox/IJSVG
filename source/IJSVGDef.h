@@ -9,12 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "IJSVGNode.h"
 
-@interface IJSVGDef : IJSVGNode {
-
-@private
-    NSMutableDictionary * _dict;
-    
-}
+@interface IJSVGDef : IJSVGNode
 
 - (void)addDef:(IJSVGNode *)aDef;
 

@@ -26,25 +26,10 @@
 
 @implementation IJSVGLayerTree
 
-@synthesize viewBox;
-@synthesize fillColor;
-@synthesize strokeColor;
-@synthesize strokeWidth;
-@synthesize lineJoinStyle;
-@synthesize lineCapStyle;
-@synthesize replacementColors;
-
-- (void)dealloc
-{
-    [fillColor release]; fillColor = nil;
-    [strokeColor release]; strokeColor = nil;
-    [replacementColors release]; replacementColors = nil;
-    [super dealloc];
-}
-
 - (id)init
 {
-    if((self = [super init]) != nil) {
+    if((self = [super init]) != nil)
+    {
         self.lineJoinStyle = IJSVGLineJoinStyleNone;
         self.lineCapStyle = IJSVGLineCapStyleNone;
     }
@@ -86,7 +71,7 @@
         for(IJSVGTransform * transform in transforms) {
             // make sure we apply the transform to the parent
             // so they stack
-            IJSVGGroupLayer * childLayer = [[[IJSVGGroupLayer alloc] init] autorelease];
+            IJSVGGroupLayer * childLayer = [[IJSVGGroupLayer alloc] init];
             childLayer.affineTransform = transform.CGAffineTransform;
             
             // add it to the parent layer
@@ -131,7 +116,7 @@
 
 - (IJSVGLayer *)layerForImage:(IJSVGImage *)image
 {
-    IJSVGImageLayer * layer = [[[IJSVGImageLayer alloc] initWithCGImage:image.CGImage] autorelease];
+    IJSVGImageLayer * layer = [[IJSVGImageLayer alloc] initWithCGImage:image.CGImage];
     layer.frame = CGRectMake(image.x.value, image.y.value, image.width.value, image.height.value);
     layer.affineTransform = CGAffineTransformConcat(layer.affineTransform,
                                                     CGAffineTransformMakeScale( 1.f, -1.f));
@@ -140,7 +125,7 @@
 
 - (IJSVGLayer *)layerForGroup:(IJSVGGroup *)group
 {
-    IJSVGGroupLayer * groupLayer = [[[IJSVGGroupLayer alloc] init] autorelease];
+    IJSVGGroupLayer * groupLayer = [[IJSVGGroupLayer alloc] init];
     for(IJSVGNode * node in group.children) {
         [groupLayer addSublayer:[self layerForNode:node]];
     }
@@ -182,7 +167,7 @@
 - (IJSVGShapeLayer *)basicLayerForPath:(IJSVGPath *)path
 {
     // setup path and layer
-    IJSVGShapeLayer * layer = [[[IJSVGShapeLayer alloc] init] autorelease];
+    IJSVGShapeLayer * layer = [[IJSVGShapeLayer alloc] init];
     CGPathRef introPath = [path newPathRefByAutoClosingPath:NO];
     
     CGRect bounds = [self correctedBounds:CGPathGetBoundingBox(introPath)];
@@ -209,7 +194,7 @@
 - (IJSVGShapeLayer *)layerMaskFromLayer:(CAShapeLayer *)layer
                                fromNode:(IJSVGNode *)node
 {
-    IJSVGShapeLayer * mask = [[[IJSVGShapeLayer alloc] init] autorelease];
+    IJSVGShapeLayer * mask = [[IJSVGShapeLayer alloc] init];
     mask.fillColor = [NSColor blackColor].CGColor;
     mask.path = layer.path;
     return mask;
@@ -382,14 +367,14 @@
 - (NSColor *)proposedColorForColor:(NSColor *)color
 {
     // nothing found, just return color
-    if(replacementColors == nil || replacementColors.count == 0) {
+    if(self.replacementColors == nil || self.replacementColors.count == 0) {
         return color;
     }
     
     // check the mappings
     NSColor * found = nil;
     color = [IJSVGColor computeColorSpace:color];
-    if((found = replacementColors[color]) != nil) {
+    if((found = self.replacementColors[color]) != nil) {
         return found;
     }
     
@@ -402,7 +387,7 @@
                                            fromNode:(IJSVGNode *)path
 {
     // the gradient drawing layer
-    IJSVGGradientLayer * gradLayer = [[[IJSVGGradientLayer alloc] init] autorelease];
+    IJSVGGradientLayer * gradLayer = [[IJSVGGradientLayer alloc] init];
     gradLayer.gradient = gradient;
     
     // is there a fill opacity?
@@ -440,7 +425,7 @@
                                              fromNode:path];
     
     // the gradient drawing layer
-    IJSVGGradientLayer * gradLayer = [[[IJSVGGradientLayer alloc] init] autorelease];
+    IJSVGGradientLayer * gradLayer = [[IJSVGGradientLayer alloc] init];
     gradLayer.frame = CGPathGetBoundingBox(((IJSVGShapeLayer *)layer).path);
     gradLayer.gradient = gradient;
     gradLayer.mask = mask;
@@ -470,7 +455,7 @@
                                          fromNode:(IJSVGNode *)path
 {
     // create the pattern, this is actually not as easy as it may seem
-    IJSVGPatternLayer * patternLayer = [[[IJSVGPatternLayer alloc] init] autorelease];
+    IJSVGPatternLayer * patternLayer = [[IJSVGPatternLayer alloc] init];
     patternLayer.patternNode = pattern;
     patternLayer.pattern = [self layerForNode:pattern];
     
@@ -495,7 +480,7 @@
                                    fromNode:(IJSVGNode *)path
 {
     // create the pattern, this is actually not as easy as it may seem
-    IJSVGPatternLayer * patternLayer = [[[IJSVGPatternLayer alloc] init] autorelease];
+    IJSVGPatternLayer * patternLayer = [[IJSVGPatternLayer alloc] init];
     patternLayer.patternNode = pattern;
     patternLayer.pattern = [self layerForNode:pattern];
     patternLayer.frame = CGPathGetBoundingBox(layer.path);
@@ -563,7 +548,7 @@
     sColor = [self proposedColorForColor:sColor];
     
     // stroke layer
-    IJSVGStrokeLayer * strokeLayer = [[[IJSVGStrokeLayer alloc] init] autorelease];
+    IJSVGStrokeLayer * strokeLayer = [[IJSVGStrokeLayer alloc] init];
     strokeLayer.path = layer.path;
     strokeLayer.fillColor = nil;
     strokeLayer.strokeColor = sColor.CGColor;
@@ -616,7 +601,7 @@
 {
     // any clippath?
     if(node.clipPath != nil || node.mask != nil) {
-        IJSVGGroupLayer * maskLayer = [[[IJSVGGroupLayer alloc] init] autorelease];
+        IJSVGGroupLayer * maskLayer = [[IJSVGGroupLayer alloc] init];
         
         // add clip mask
         if(node.clipPath != nil) {
@@ -689,11 +674,11 @@
 
 - (NSArray<NSNumber *> *)lineDashPattern:(IJSVGNode *)node
 {
-    NSMutableArray * arr = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * arr = [[NSMutableArray alloc] init];
     for(NSInteger i = 0; i < node.strokeDashArrayCount; i++) {
         [arr addObject:@((CGFloat)node.strokeDashArray[i])];
     }
-    return [[arr copy] autorelease];
+    return [arr copy];
 }
 
 - (NSString *)lineJoin:(IJSVGLineJoinStyle)joinStyle

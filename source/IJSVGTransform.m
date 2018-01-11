@@ -11,15 +11,9 @@
 
 @implementation IJSVGTransform
 
-@synthesize command;
-@synthesize parameters;
-@synthesize parameterCount;
-@synthesize sort;
-
 - (void)dealloc
 {
-    free(parameters);
-    [super dealloc];
+    free(self.parameters);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -27,7 +21,7 @@
     IJSVGTransform * trans = [[[self class] alloc] init];
     trans.command = self.command;
     trans.parameters = (CGFloat*)malloc(sizeof(CGFloat)*self.parameterCount);
-    trans.sort = sort;
+    trans.sort = self.sort;
     trans.parameterCount = self.parameterCount;
     memcpy( trans.parameters, self.parameters, sizeof(CGFloat)*self.parameterCount);
     return trans;
@@ -92,7 +86,7 @@
                                                     options:0
                                                       error:nil];
     });
-    NSMutableArray * transforms = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * transforms = [[NSMutableArray alloc] init];
     @autoreleasepool {
         [_reg enumerateMatchesInString:string
                                options:0
@@ -106,7 +100,7 @@
             
             // create the transform
             NSString * params = [string substringWithRange:[result rangeAtIndex:2]];
-            IJSVGTransform * transform = [[[[self class] alloc] init] autorelease];
+            IJSVGTransform * transform = [[[self class] alloc] init];
             NSInteger count = 0;
             transform.command = commandType;
             transform.parameters = [IJSVGUtils commandParameters:params
@@ -123,7 +117,7 @@
 {
     if( path.transforms.count == 0 )
         return path.path;
-    NSBezierPath * cop = [[path.path copy] autorelease];
+    NSBezierPath * cop = [path.path copy];
     for( IJSVGTransform * transform in path.transforms )
     {
         NSAffineTransform * at = [NSAffineTransform transform];
@@ -419,7 +413,7 @@
     CGFloat rowSum = data[0]*data[1] + data[2]*data[3];
     BOOL scaleBefore = rowSum != 0.f || (sx == sy);
     
-    NSMutableArray * trans = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * trans = [[NSMutableArray alloc] init];
     
     // translate
     if(data[4] != 0.f || data[5] != 0.f) {

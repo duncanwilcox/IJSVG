@@ -10,17 +10,13 @@
 #import "IJSVGLayer.h"
 #import "IJSVGUtils.h"
 
-@interface IJSVGShapeLayer : CAShapeLayer {
-    
-@private
-    IJSVGLayer * _maskingLayer;
-}
+@interface IJSVGShapeLayer : CAShapeLayer
 
-@property (nonatomic, assign) IJSVGGradientLayer * gradientFillLayer;
-@property (nonatomic, assign) IJSVGPatternLayer * patternFillLayer;
-@property (nonatomic, assign) IJSVGStrokeLayer * strokeLayer;
-@property (nonatomic, assign) IJSVGGradientLayer * gradientStrokeLayer;
-@property (nonatomic, assign) IJSVGPatternLayer * patternStrokeLayer;
+@property (nonatomic, unsafe_unretained) IJSVGGradientLayer * gradientFillLayer;
+@property (nonatomic, unsafe_unretained) IJSVGPatternLayer * patternFillLayer;
+@property (nonatomic, unsafe_unretained) IJSVGStrokeLayer * strokeLayer;
+@property (nonatomic, unsafe_unretained) IJSVGGradientLayer * gradientStrokeLayer;
+@property (nonatomic, unsafe_unretained) IJSVGPatternLayer * patternStrokeLayer;
 @property (nonatomic, assign) BOOL requiresBackingScaleHelp;
 @property (nonatomic, assign) CGFloat backingScaleFactor;
 @property (nonatomic, assign) CGBlendMode blendingMode;

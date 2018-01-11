@@ -12,12 +12,7 @@
 
 @class IJSVGNode;
 
-@interface IJSVGStyleSheet : NSObject {
-    
-@private
-    NSMutableDictionary * _selectors;
-    NSMutableArray * _rules;
-}
+@interface IJSVGStyleSheet : NSObject
 
 - (void)parseStyleBlock:(NSString *)string;
 - (IJSVGStyle *)styleForNode:(IJSVGNode *)node;

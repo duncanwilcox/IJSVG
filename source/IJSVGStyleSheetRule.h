@@ -12,15 +12,10 @@
 
 @class IJSVGNode;
 
-@interface IJSVGStyleSheetRule : NSObject {
-    
-    NSArray * selectors;
-    IJSVGStyle * style;
-    
-}
+@interface IJSVGStyleSheetRule : NSObject
 
-@property (nonatomic, retain) NSArray * selectors;
-@property (nonatomic, retain) IJSVGStyle * style;
+@property (nonatomic, strong) NSArray *selectors;
+@property (nonatomic, strong) IJSVGStyle *style;
 
 - (BOOL)matchesNode:(IJSVGNode *)node
            selector:(IJSVGStyleSheetSelector **)matchedSelector;

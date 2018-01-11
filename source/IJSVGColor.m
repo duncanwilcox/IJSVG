@@ -614,7 +614,7 @@ static NSMutableDictionary * _colorTree = nil;
     // whats the length?
     if(string.length == 3) {
         // shorthand...
-        NSMutableString * str = [[[NSMutableString alloc] init] autorelease];
+        NSMutableString * str = [[NSMutableString alloc] init];
         for( NSInteger i = 0; i < string.length; i++ )
         {
             NSString * sub = [string substringWithRange:NSMakeRange( i, 1)];

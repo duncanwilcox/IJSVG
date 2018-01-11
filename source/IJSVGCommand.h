@@ -30,28 +30,17 @@ typedef NS_ENUM( NSInteger, IJSVGCommandType ) {
 
 @end
 
-@interface IJSVGCommand : NSObject {
-    NSString * commandString;
-    NSString * command;
-    CGFloat * parameters;
-    NSInteger parameterCount;
-    NSMutableArray * subCommands;
-    NSInteger requiredParameters;
-    IJSVGCommandType type;
-    IJSVGCommand * previousCommand;
-    NSInteger _currentIndex;
-    Class<IJSVGCommandProtocol> commandClass;
-}
+@interface IJSVGCommand : NSObject
 
-@property ( nonatomic, copy ) NSString * commandString;
-@property ( nonatomic, copy ) NSString * command;
-@property ( nonatomic, assign ) CGFloat * parameters;
-@property ( nonatomic, assign ) NSInteger parameterCount;
-@property ( nonatomic, assign ) NSInteger requiredParameters;
-@property ( nonatomic, assign ) IJSVGCommandType type;
-@property ( nonatomic, retain ) NSMutableArray * subCommands;
-@property ( nonatomic, assign ) Class<IJSVGCommandProtocol> commandClass;
-@property ( nonatomic, assign ) IJSVGCommand * previousCommand;
+@property (nonatomic, copy) NSString * commandString;
+@property (nonatomic, copy) NSString * command;
+@property (nonatomic, assign) CGFloat * parameters;
+@property (nonatomic, assign) NSInteger parameterCount;
+@property (nonatomic, assign) NSInteger requiredParameters;
+@property (nonatomic, assign) IJSVGCommandType type;
+@property (nonatomic, strong) NSMutableArray * subCommands;
+@property (nonatomic, assign) Class<IJSVGCommandProtocol> commandClass;
+@property (nonatomic, weak) IJSVGCommand * previousCommand;
 
 - (id)initWithCommandString:(NSString *)commandString;
 

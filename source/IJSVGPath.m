@@ -9,26 +9,19 @@
 #import "IJSVGPath.h"
 #import "IJSVGGroup.h"
 
+@interface IJSVGPath ()
+@property (nonatomic, weak, readwrite) NSBezierPath *path;
+@property (nonatomic, strong, readwrite) NSBezierPath *subpath;
+@end
+
 @implementation IJSVGPath
-
-@synthesize path;
-@synthesize subpath;
-@synthesize lastControlPoint;
-
-- (void)dealloc
-{
-    if(subpath!=nil) {
-        [subpath release]; subpath = nil;
-    }
-    [super dealloc];
-}
 
 - (id)init
 {
     if( ( self = [super init] ) != nil )
     {
-        subpath = [[NSBezierPath bezierPath] retain];
-        path = subpath; // for legacy use
+        self.subpath = [NSBezierPath bezierPath];
+        self.path = self.subpath; // for legacy use
     }
     return self;
 }
@@ -42,24 +35,24 @@
 
 - (NSPoint)currentPoint
 {
-    return [subpath currentPoint];
+    return [self.subpath currentPoint];
 }
 
 - (NSBezierPath *)currentSubpath
 {
-    return subpath;
+    return self.subpath;
 }
 
 - (void)close
 {
-    [subpath closePath];
+    [self.subpath closePath];
 }
 
 - (void)overwritePath:(NSBezierPath *)aPath
 {
-    [subpath release]; subpath = nil;
-    subpath = [aPath retain];
-    path = subpath;
+    self.subpath = nil;
+    self.subpath = aPath;
+    self.path = self.subpath;
 }
 
 - (CGPathRef)newPathRefByAutoClosingPath:(BOOL)autoClose

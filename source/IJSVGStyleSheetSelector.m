@@ -10,13 +10,16 @@
 #import "IJSVGNode.h"
 #import "IJSVGGroup.h"
 
+@interface IJSVGStyleSheetSelector ()
+@property (nonatomic, strong) NSString *selector;
+@property (nonatomic, strong) NSMutableArray *rawSelectors;
+@end
+
 @implementation IJSVGStyleSheetSelector
 
 #define SPECIFICITY_TAG 1
 #define SPECIFICITY_CLASS 10
 #define SPECIFICITY_IDENTIFIER 100
-
-@synthesize specificity;
 
 BOOL IJSVGStyleSheetIsSiblingCombinator(IJSVGStyleSheetSelectorCombinator combinator)
 {
@@ -123,7 +126,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
                 // straight forward again, find the previous sibling
                 // and match it against the next selector in the list
                 IJSVGNode * previousNode = IJSVGStyleSheetPreviousNode(aNode);
-                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector, _rawSelectors);
+                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector, self.rawSelectors);
                 
                 if(previousNode != nil &&  IJSVGStyleSheetMatchSelector(previousNode, s)) {
                     // set the new starting selector and node
@@ -158,7 +161,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
                 }
                 
                 // find the next selector
-                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,_rawSelectors);
+                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,self.rawSelectors);
                 BOOL found = NO;
                 for( NSUInteger i = index; index > 0; i-- ) {
                     
@@ -191,7 +194,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
             if(aSelector.combinator == IJSVGStyleSheetSelectorCombinatorDescendant) {
                 // go up the chain until we match a parent that
                 // matches the next selector
-                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,_rawSelectors);
+                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,self.rawSelectors);
                 IJSVGNode * p = aNode;
                 while(p != nil) {
                     
@@ -226,7 +229,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
                 
                 // really straight forward, just check if the parent
                 // matches the next selector and... contains the node in question
-                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,_rawSelectors);
+                IJSVGStyleSheetSelectorRaw * s = IJSVGStyleSheetNextSelector(aSelector,self.rawSelectors);
                 if(IJSVGStyleSheetMatchSelector(parentNode, s) &&
                    [parentNode.children containsObject:aNode]) {
                     // set the new starting selector and node
@@ -244,23 +247,16 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
     return YES;
 }
 
-- (void)dealloc
-{
-    [_rawSelectors release]; _rawSelectors = nil;
-    [selector release]; selector = nil;
-    [super dealloc];
-}
-
 - (id)initWithSelectorString:(NSString *)string
 {
     if((self = [super init]) != nil)
     {
-        selector = [string copy];
-        _rawSelectors = [[NSMutableArray alloc] init];
+        self.selector = [string copy];
+        self.rawSelectors = [[NSMutableArray alloc] init];
         
         // failed to compile
         if([self _compile] == NO) {
-            [self release]; self = nil;
+            self = nil;
             return nil;
         }
         [self _calculate];
@@ -272,7 +268,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
 {
     // calculate the specificity
     // of the selector
-    for(IJSVGStyleSheetSelectorRaw * rawSelector in _rawSelectors) {
+    for(IJSVGStyleSheetSelectorRaw * rawSelector in self.rawSelectors) {
         
         // 1 for a tag
         if(rawSelector.tag != nil) {
@@ -308,7 +304,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
 {
     
     // completely unsupported
-    if([self validateSelector:selector] == NO) {
+    if([self validateSelector:self.selector] == NO) {
         return NO;
     }
     
@@ -325,23 +321,23 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
     };
     
     
-    NSUInteger length = selector.length;
-    NSMutableArray * sels = [[[NSMutableArray alloc] init] autorelease];
-    IJSVGStyleSheetSelectorRaw * rawSelector = [[[IJSVGStyleSheetSelectorRaw alloc] init] autorelease];
+    NSUInteger length = self.selector.length;
+    NSMutableArray * sels = [[NSMutableArray alloc] init];
+    IJSVGStyleSheetSelectorRaw * rawSelector = [[IJSVGStyleSheetSelectorRaw alloc] init];
     
     for(NSUInteger i = 0; i < length; i++) {
-        unichar c = [selector characterAtIndex:i];
+        unichar c = [self.selector characterAtIndex:i];
         // beginning of class
         if( c == '.' ) {
             i++;
             for(NSUInteger a = i; a < length; a++ ) {
-                unichar ca = [selector characterAtIndex:a];
+                unichar ca = [self.selector characterAtIndex:a];
                 if(isKeyChar(ca) == YES || a == length-1) {
                     // if at end, add 1 to a so it gets the last character
                     if( a == length-1 ) {
                         a++;
                     }
-                    [rawSelector addClassName:[selector substringWithRange:NSMakeRange(i, a-i)]];
+                    [rawSelector addClassName:[self.selector substringWithRange:NSMakeRange(i, a-i)]];
                     i = a-1;
                     break;
                 }
@@ -352,13 +348,13 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
         else if( c == '#' ) {
             i++;
             for(NSUInteger a = i; a < length; a++ ) {
-                unichar ca = [selector characterAtIndex:a];
+                unichar ca = [self.selector characterAtIndex:a];
                 if(isKeyChar(ca) == YES || a == length-1) {
                     // if at end, add 1 to a so it gets the last character
                     if( a == length-1 ) {
                         a++;
                     }
-                    rawSelector.identifier = [selector substringWithRange:NSMakeRange(i, a-i)];
+                    rawSelector.identifier = [self.selector substringWithRange:NSMakeRange(i, a-i)];
                     i = a-1;
                     break;
                 }
@@ -376,7 +372,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
             
             // need to skip until we find something that isnt white space....
             for( NSUInteger s = i; s < length; s++ ) {
-                unichar sc = [selector characterAtIndex:s];
+                unichar sc = [self.selector characterAtIndex:s];
                 if( sc != ' ' ) {
                     i = --s;
                     break;
@@ -385,7 +381,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
             
             // reset the raw selector
             if(!(i == length-1)) {
-                rawSelector = [[[IJSVGStyleSheetSelectorRaw alloc] init] autorelease];
+                rawSelector = [[IJSVGStyleSheetSelectorRaw alloc] init];
             }
         }
         
@@ -399,7 +395,7 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
             // skip until non white space
             // need to skip until we find something that isnt white space....
             for( NSUInteger s = i+1; s < length; s++ ) {
-                unichar sc = [selector characterAtIndex:s];
+                unichar sc = [self.selector characterAtIndex:s];
                 if( sc != ' ' ) {
                     i = --s;
                     break;
@@ -411,12 +407,12 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
         // tag name / any other character
         else {
             for( NSUInteger a = i; a < length; a++ ) {
-                unichar ca = [selector characterAtIndex:a];
+                unichar ca = [self.selector characterAtIndex:a];
                 if(isKeyChar(ca) == YES || a == length-1) {
                     if( a == length-1 ) {
                         a++;
                     }
-                    rawSelector.tag = [selector substringWithRange:NSMakeRange(i, a-i)];
+                    rawSelector.tag = [self.selector substringWithRange:NSMakeRange(i, a-i)];
                     i = a-1;
                     break;
                 }
@@ -433,20 +429,20 @@ BOOL IJSVGStyleSheetMatchSelector(IJSVGNode * node, IJSVGStyleSheetSelectorRaw *
         
     }
     // now its compiled, we need to reverse the selectors
-    [_rawSelectors addObjectsFromArray:[sels reverseObjectEnumerator].allObjects];
+    [self.rawSelectors addObjectsFromArray:[sels reverseObjectEnumerator].allObjects];
     return YES;
 }
 
 
 - (BOOL)matchesNode:(IJSVGNode *)node
 {
-    IJSVGStyleSheetSelectorRaw * sel = _rawSelectors[0];
+    IJSVGStyleSheetSelectorRaw * sel = self.rawSelectors[0];
     // return YES only if the first selector matches the node
     // and the next selector is nil, or the next selector isnt nil
     // and the node then goes up the tree and works itself out with the
     // selectors in question
     if(IJSVGStyleSheetMatchSelector(node, sel) &&
-       (IJSVGStyleSheetNextSelector(sel,_rawSelectors) == nil ||
+       (IJSVGStyleSheetNextSelector(sel,self.rawSelectors) == nil ||
         [self _matches:node selector:sel])) {
         return YES;
     }

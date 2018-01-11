@@ -10,11 +10,7 @@
 #import "IJSVGNode.h"
 #import "IJSVGPath.h"
 
-@interface IJSVGGroup : IJSVGNode {
-    
-    NSMutableArray * children;
-    
-}
+@interface IJSVGGroup : IJSVGNode
 
 - (void)addChild:(id)child;
 - (NSArray *)children;

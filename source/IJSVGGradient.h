@@ -12,15 +12,15 @@
 
 @interface IJSVGGradient : IJSVGNode
 
-@property ( nonatomic, retain ) NSGradient * gradient;
+@property ( nonatomic, strong ) NSGradient * gradient;
 @property ( nonatomic, assign ) CGFloat angle;
 @property ( nonatomic, assign ) CGPoint startPoint;
 @property ( nonatomic, assign ) CGPoint endPoint;
 @property ( nonatomic, assign ) CGGradientRef CGGradient;
-@property ( nonatomic, retain ) IJSVGUnitLength * x1;
-@property ( nonatomic, retain ) IJSVGUnitLength * x2;
-@property ( nonatomic, retain ) IJSVGUnitLength * y1;
-@property ( nonatomic, retain ) IJSVGUnitLength * y2;
+@property ( nonatomic, strong ) IJSVGUnitLength * x1;
+@property ( nonatomic, strong ) IJSVGUnitLength * x2;
+@property ( nonatomic, strong ) IJSVGUnitLength * y1;
+@property ( nonatomic, strong ) IJSVGUnitLength * y2;
 
 + (CGFloat *)computeColorStopsFromString:(NSXMLElement *)element
                                   colors:(NSArray **)someColors;

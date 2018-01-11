@@ -10,8 +10,6 @@
 #import "IJSVGGroup.h"
 #import "IJSVGImage.h"
 
-@interface IJSVGPattern : IJSVGGroup {
-    
-}
+@interface IJSVGPattern : IJSVGGroup
 
 @end

@@ -10,69 +10,50 @@
 #import "IJSVGStyle.h"
 #import "IJSVGNode.h"
 
-@interface IJSVGStyleSheetSelectorListItem : NSObject {
-    
-    IJSVGStyleSheetSelector * selector;
-    IJSVGStyleSheetRule * rule;
-    
-}
-
-@property (nonatomic, retain) IJSVGStyleSheetRule * rule;
-@property (nonatomic, retain) IJSVGStyleSheetSelector * selector;
-
+@interface IJSVGStyleSheetSelectorListItem : NSObject
+@property (nonatomic, strong) IJSVGStyleSheetRule *rule;
+@property (nonatomic, strong) IJSVGStyleSheetSelector *selector;
 @end
 
 @implementation IJSVGStyleSheetSelectorListItem
+@end
 
-@synthesize rule, selector;
-
-- (void)dealloc
-{
-    [rule release]; rule = nil;
-    [selector release]; selector = nil;
-    [super dealloc];
-}
-
+@interface IJSVGStyleSheet ()
+@property (nonatomic, strong) NSMutableDictionary *selectors;
+@property (nonatomic, strong) NSMutableArray *rules;
 @end
 
 @implementation IJSVGStyleSheet
-
-- (void)dealloc
-{
-    [_selectors release]; _selectors = nil;
-    [_rules release]; _rules = nil;
-    [super dealloc];
-}
 
 - (id)init
 {
     if((self = [super init]) != nil)
     {
-        _selectors = [[NSMutableDictionary alloc] init];
-        _rules = [[NSMutableArray alloc] init];
+        self.selectors = [[NSMutableDictionary alloc] init];
+        self.rules = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (NSArray *)selectorsWithSelectorString:(NSString *)string
 {
-    NSMutableArray * array = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * array = [[NSMutableArray alloc] init];
     
     // split the string by the comma, as it could be multiple
     NSArray * comp = [string componentsSeparatedByString:@","];
     NSCharacterSet * whiteSpaceCharSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     
     // create a selector or reuse one already being used
-    for( NSString * selectorName in comp )
+    for( __strong NSString * selectorName in comp )
     {
         selectorName = [selectorName stringByTrimmingCharactersInSet:whiteSpaceCharSet];
         IJSVGStyleSheetSelector * selector = nil;
         
         // create a new selector if not found
-        if((selector = [_selectors objectForKey:selectorName]) == nil) {
-            selector = [[[IJSVGStyleSheetSelector alloc] initWithSelectorString:selectorName] autorelease];
+        if((selector = [self.selectors objectForKey:selectorName]) == nil) {
+            selector = [[IJSVGStyleSheetSelector alloc] initWithSelectorString:selectorName];
             if(selector != nil) {
-                [_selectors setObject:selector
+                [self.selectors setObject:selector
                                forKey:selectorName];
             }
         }
@@ -155,24 +136,24 @@
 {
     // append the rule onto the list within
     // this style sheet
-    IJSVGStyleSheetRule * aRule = [[[IJSVGStyleSheetRule alloc] init] autorelease];
+    IJSVGStyleSheetRule * aRule = [[IJSVGStyleSheetRule alloc] init];
     aRule.style = [IJSVGStyle parseStyleString:rule];
     aRule.selectors = selectors;
-    [_rules addObject:aRule];
+    [self.rules addObject:aRule];
 }
 
 - (IJSVGStyle *)styleForNode:(IJSVGNode *)node
 {
-    IJSVGStyle * style = [[[IJSVGStyle alloc] init] autorelease];
-    NSMutableArray * matchedRules = [[[NSMutableArray alloc] init] autorelease];
-    for(IJSVGStyleSheetRule * rule in _rules)
+    IJSVGStyle * style = [[IJSVGStyle alloc] init];
+    NSMutableArray * matchedRules = [[NSMutableArray alloc] init];
+    for(IJSVGStyleSheetRule * rule in self.rules)
     {
         IJSVGStyleSheetSelector * matchedSelector = nil;
         if([rule matchesNode:node selector:&matchedSelector]) {
             
             // make a wrapper for the selector with the rule
             IJSVGStyleSheetSelectorListItem * listItem = nil;
-            listItem = [[[IJSVGStyleSheetSelectorListItem alloc] init] autorelease];
+            listItem = [[IJSVGStyleSheetSelectorListItem alloc] init];
             listItem.rule = rule;
             listItem.selector = matchedSelector;
             

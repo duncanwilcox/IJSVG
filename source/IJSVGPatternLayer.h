@@ -12,7 +12,7 @@
 
 @interface IJSVGPatternLayer : IJSVGLayer
 
-@property (nonatomic, retain) IJSVGLayer * pattern;
-@property (nonatomic, retain) IJSVGPattern * patternNode;
+@property (nonatomic, strong) IJSVGLayer * pattern;
+@property (nonatomic, strong) IJSVGPattern * patternNode;
 
 @end

@@ -8,13 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface IJSVGExporterPathInstruction : NSObject {
-    
-@private
-    NSInteger _dataCount;
-    char _instruction;
-    CGFloat * _data;
-}
+@interface IJSVGExporterPathInstruction : NSObject
 
 + (NSArray<IJSVGExporterPathInstruction *> *)instructionsFromPath:(CGPathRef)path;
 

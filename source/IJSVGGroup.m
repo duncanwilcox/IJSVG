@@ -8,26 +8,24 @@
 
 #import "IJSVGGroup.h"
 
-@implementation IJSVGGroup
+@interface IJSVGGroup ()
+@property (nonatomic, strong) NSMutableArray *childrenInternal;
+@end
 
-- (void)dealloc
-{
-    [children release]; children = nil;
-    [super dealloc];
-}
+@implementation IJSVGGroup
 
 - (id)init
 {
     if( ( self = [super init] ) != nil )
     {
-        children = [[NSMutableArray alloc] init];
+        self.childrenInternal = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (void)prepareFromCopy
 {
-    children = [[NSMutableArray alloc] init];
+    self.childrenInternal = [[NSMutableArray alloc] init];
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -35,9 +33,9 @@
     IJSVGGroup * node = [super copyWithZone:zone];
     [node prepareFromCopy];
     
-    for( IJSVGNode * childNode in self.children )
+    for( __strong IJSVGNode * childNode in self.childrenInternal )
     {
-        childNode = [[childNode copy] autorelease];
+        childNode = [childNode copy];
         childNode.parentNode = node;
         [node addChild:childNode];
     }
@@ -46,23 +44,23 @@
 
 - (void)purgeChildren
 {
-    [children removeAllObjects];
+    [self.childrenInternal removeAllObjects];
 }
 
 - (void)addChild:(id)child
 {
     if( child != nil )
-        [children addObject:child];
+        [self.childrenInternal addObject:child];
 }
 
 - (NSArray *)children
 {
-    return children;
+    return self.childrenInternal;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@ - %@",[super description],self.children];
+    return [NSString stringWithFormat:@"%@ - %@",[super description],self.childrenInternal];
 }
 
 @end

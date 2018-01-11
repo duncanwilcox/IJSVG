@@ -9,25 +9,30 @@
 #import "IJSVGExporterPathInstruction.h"
 #import "IJSVGExporter.h"
 
+@interface IJSVGExporterPathInstruction ()
+@property (nonatomic, assign) NSInteger dataCount;
+@property (nonatomic, assign) char instruction;
+@property (nonatomic, assign) CGFloat *data;
+@end
+
 @implementation IJSVGExporterPathInstruction
 
 - (void)dealloc
 {
-    if(_data != NULL) {
-        free(_data);
+    if(self.data != NULL) {
+        free(self.data);
     }
-    [super dealloc];
 }
 
 - (id)initWithInstruction:(char)instruction
                 dataCount:(NSInteger)floatCount
 {
     if((self = [super init]) != nil) {
-        _instruction = instruction;
+        self.instruction = instruction;
         
         // only allocate if not zero
         if(floatCount != 0) {
-            _data = (CGFloat *)calloc(sizeof(CGFloat), floatCount);
+            self.data = (CGFloat *)calloc(sizeof(CGFloat), floatCount);
         }
     }
     return self;
@@ -35,27 +40,27 @@
 
 - (NSInteger)dataLength
 {
-    return _dataCount;
+    return self.dataCount;
 }
 
 - (void)setInstruction:(char)newInstruction
 {
-    _instruction = newInstruction;
+    self.instruction = newInstruction;
 }
 
 - (char)instruction
 {
-    return _instruction;
+    return self.instruction;
 }
 
 - (CGFloat *)data
 {
-    return _data;
+    return self.data;
 }
 
 + (NSString *)pathStringFromInstructions:(NSArray<IJSVGExporterPathInstruction *> *)instructions
 {
-    NSMutableArray * pathData = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * pathData = [[NSMutableArray alloc] init];
     for(IJSVGExporterPathInstruction * instruction in instructions) {
         CGFloat * data = instruction.data;
         NSString * str = nil;
@@ -262,7 +267,7 @@
     
     // keep track of the current point
     __block CGPoint currentPoint = CGPointZero;
-    NSMutableArray * instructions = [[[NSMutableArray alloc] init] autorelease];
+    NSMutableArray * instructions = [[NSMutableArray alloc] init];
     
     // create the path callback
     IJSVGCGPathHandler callback = ^(const CGPathElement * pathElement) {
@@ -272,8 +277,8 @@
                 
             case kCGPathElementMoveToPoint: {
                 // move to command
-                instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'M'
-                                                                               dataCount:2] autorelease];
+                instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'M'
+                                                                               dataCount:2];
                 CGPoint point = pathElement->points[0];
                 instruction.data[0] = point.x;
                 instruction.data[1] = point.y;
@@ -287,16 +292,16 @@
                 // line to command
                 CGPoint point = pathElement->points[0];
                 if(point.x == currentPoint.x) {
-                    instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'V'
-                                                                                   dataCount:1] autorelease];
+                    instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'V'
+                                                                                   dataCount:1];
                     instruction.data[0] = point.y;
                 } else if(point.y == currentPoint.y) {
-                    instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'H'
-                                                                                   dataCount:1] autorelease];
+                    instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'H'
+                                                                                   dataCount:1];
                     instruction.data[0] = point.x;
                 } else {
-                    instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'L'
-                                                                                   dataCount:2] autorelease];
+                    instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'L'
+                                                                                   dataCount:2];
                     instruction.data[0] = point.x;
                     instruction.data[1] = point.y;
                 }
@@ -310,8 +315,8 @@
                 // quad curve to command
                 CGPoint controlPoint = pathElement->points[0];
                 CGPoint point = pathElement->points[1];
-                instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'Q'
-                                                                               dataCount:4] autorelease];
+                instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'Q'
+                                                                               dataCount:4];
                 instruction.data[0] = controlPoint.x;
                 instruction.data[1] = controlPoint.y;
                 instruction.data[2] = point.x;
@@ -328,8 +333,8 @@
                 CGPoint controlPoint2 = pathElement->points[1];
                 CGPoint point = pathElement->points[2];
                 currentPoint = point;
-                instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'C'
-                                                                               dataCount:6] autorelease];
+                instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'C'
+                                                                               dataCount:6];
                 instruction.data[0] = controlPoint1.x;
                 instruction.data[1] = controlPoint1.y;
                 instruction.data[2] = controlPoint2.x;
@@ -343,8 +348,8 @@
                 
             case kCGPathElementCloseSubpath: {
                 // close command
-                instruction = [[[IJSVGExporterPathInstruction alloc] initWithInstruction:'Z'
-                                                                               dataCount:0] autorelease];
+                instruction = [[IJSVGExporterPathInstruction alloc] initWithInstruction:'Z'
+                                                                               dataCount:0];
                 [instructions addObject:instruction];
                 break;
             }

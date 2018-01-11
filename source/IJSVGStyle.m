@@ -9,18 +9,16 @@
 #import "IJSVGStyle.h"
 #import "IJSVGUtils.h"
 
-@implementation IJSVGStyle
+@interface IJSVGStyle ()
+@property (nonatomic, strong) NSMutableDictionary *dict;
+@end
 
-- (void)dealloc
-{
-    [_dict release]; _dict = nil;
-    [super dealloc];
-}
+@implementation IJSVGStyle
 
 - (id)init
 {
     if( ( self = [super init] ) != nil ) {
-        _dict = [[NSMutableDictionary alloc] init];
+        self.dict = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -28,23 +26,23 @@
 - (void)setPropertyValue:(id)value
              forProperty:(NSString *)key
 {
-    [_dict setObject:value
+    [self.dict setObject:value
               forKey:key];
 }
 
 - (NSDictionary *)properties
 {
-    return _dict;
+    return self.dict;
 }
 
 - (id)property:(NSString *)key
 {
-    return [_dict objectForKey:key];
+    return [self.dict objectForKey:key];
 }
 
 + (IJSVGStyle *)parseStyleString:(NSString *)string
 {
-    IJSVGStyle * style = [[[[self class] alloc] init] autorelease];
+    IJSVGStyle * style = [[[self class] alloc] init];
     NSInteger length = string.length;
     NSInteger index = 0;
     NSString * key = nil;
@@ -103,23 +101,23 @@
            replaceAll:(BOOL)flag
 {
     if(flag) {
-        [_dict removeAllObjects];
+        [self.dict removeAllObjects];
     }
-    [_dict addEntriesFromDictionary:properties];
+    [self.dict addEntriesFromDictionary:properties];
 }
 
 - (NSString *)description
 {
-    return [_dict description];
+    return [self.dict description];
 }
 
 - (IJSVGStyle *)mergedStyle:(IJSVGStyle *)style
 {
     // create the new style
-    IJSVGStyle * newStyle = [[[IJSVGStyle alloc] init] autorelease];
+    IJSVGStyle * newStyle = [[IJSVGStyle alloc] init];
     
     // grab the current style
-    NSMutableDictionary * dict = [[[self properties] mutableCopy] autorelease];
+    NSMutableDictionary * dict = [[self properties] mutableCopy];
     
     // overwride the style with the new styles
     [dict addEntriesFromDictionary:[style properties]];

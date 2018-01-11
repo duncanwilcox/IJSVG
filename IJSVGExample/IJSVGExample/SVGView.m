@@ -9,21 +9,20 @@
 #import "SVGView.h"
 #import "IJSVGExporter.h"
 
-@implementation SVGView
+@interface SVGView ()
+@property (nonatomic, strong) IJSVG *svg;
+@end
 
-- (void)dealloc
-{
-    [svg release]; svg = nil;
-    [super dealloc];
-}
+@implementation SVGView
 
 - (id)initWithFrame:(NSRect)frameRect
 {
     if( ( self = [super initWithFrame:frameRect] ) != nil )
     {
-        svg = [self svg];
-        svg.renderingBackingScaleHelper = ^{
-            return [svg computeBackingScale:self.window.backingScaleFactor];
+        __weak SVGView *weakSelf = self;
+        self.svg = [self svg];
+        self.svg.renderingBackingScaleHelper = ^{
+            return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
         };
     }
     return self;
@@ -40,7 +39,7 @@
     CGContextSaveGState(ref);
     CGContextTranslateCTM( ref, 0, self.bounds.size.height);
     CGContextScaleCTM( ref, 1, -1 );
-    [svg drawInRect:self.bounds];
+    [self.svg drawInRect:self.bounds];
     CGContextRestoreGState(ref);
 }
 

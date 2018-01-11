@@ -9,13 +9,4 @@
 #import "IJSVGForeignObject.h"
 
 @implementation IJSVGForeignObject
-
-@synthesize requiredExtension;
-
-- (void)dealloc
-{
-    [requiredExtension release]; requiredExtension = nil;
-    [super dealloc];
-}
-
 @end

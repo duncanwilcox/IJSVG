@@ -10,22 +10,6 @@
 
 @implementation IJSVGRadialGradient
 
-@synthesize cx;
-@synthesize cy;
-@synthesize fx;
-@synthesize fy;
-@synthesize radius;
-
-- (void)dealloc
-{
-    [cx release]; cx = nil;
-    [cy release]; cy = nil;
-    [fx release]; fx = nil;
-    [fy release]; fy = nil;
-    [radius release]; radius = nil;
-    [super dealloc];
-}
-
 - (id)copyWithZone:(NSZone *)zone
 {
     IJSVGRadialGradient * grad = [super copyWithZone:zone];
@@ -38,7 +22,6 @@
     grad.endPoint = self.endPoint;
     return grad;
 }
-
 
 + (NSGradient *)parseGradient:(NSXMLElement *)element
                      gradient:(IJSVGRadialGradient *)gradient
@@ -79,9 +62,9 @@
     
     NSArray * colors = nil;
     CGFloat * colorStops = [[self class] computeColorStopsFromString:element colors:&colors];
-    NSGradient * ret = [[[NSGradient alloc] initWithColors:colors
+    NSGradient * ret = [[NSGradient alloc] initWithColors:colors
                                                atLocations:colorStops
-                                                colorSpace:[NSColorSpace genericRGBColorSpace]] autorelease];
+                                                colorSpace:[NSColorSpace genericRGBColorSpace]];
     free(colorStops);
     return ret;
 }

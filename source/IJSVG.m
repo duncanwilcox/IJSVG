@@ -10,25 +10,22 @@
 #import "IJSVGCache.h"
 #import "IJSVGTransaction.h"
 
+@interface IJSVG ()
+@property (nonatomic, strong) IJSVGParser *group;
+@property (nonatomic, assign) CGFloat scale;
+@property (nonatomic, assign) CGFloat clipScale;
+@property (nonatomic, weak) id<IJSVGDelegate> delegate;
+@property (nonatomic, strong) IJSVGLayer *layerTree;
+@property (nonatomic, assign) CGRect viewBox;
+@property (nonatomic, assign) CGSize proposedViewSize;
+@property (nonatomic, assign) CGFloat lastProposedBackingScale;
+@property (nonatomic, strong) NSMutableDictionary *replacementColorsInternal;
+@property (nonatomic, assign) BOOL respondsTo_shouldHandleForeignObject;
+@property (nonatomic, assign) BOOL respondsTo_handleForeignObject;
+@property (nonatomic, assign) BOOL respondsTo_shouldHandleSubSVG;
+@end
+
 @implementation IJSVG
-
-@synthesize fillColor;
-@synthesize strokeColor;
-@synthesize strokeWidth;
-@synthesize lineCapStyle;
-@synthesize lineJoinStyle;
-@synthesize renderingBackingScaleHelper;
-
-- (void)dealloc
-{
-    [renderingBackingScaleHelper release]; renderingBackingScaleHelper = nil;
-    [fillColor release]; fillColor = nil;
-    [strokeColor release]; strokeColor = nil;
-    [_group release]; _group = nil;
-    [_layerTree release]; _layerTree = nil;
-    [_replacementColors release]; _replacementColors = nil;
-    [super dealloc];
-}
 
 + (id)svgNamed:(NSString *)string
          error:(NSError **)error
@@ -84,10 +81,10 @@
         ext = @"svg";
     }
     if( ( str = [bundle pathForResource:[string stringByDeletingPathExtension] ofType:ext] ) != nil ) {
-        return [[[self alloc] initWithFile:str
+        return [[self alloc] initWithFile:str
                                   useCache:useCache
                                      error:error
-                                  delegate:delegate] autorelease];
+                                  delegate:delegate];
     }
     return nil;
 }
@@ -100,8 +97,8 @@
     // make sure we obtain a lock, with whatever we do with layers!
     IJSVGObtainTransactionLock(^{
         // create the layers we require
-        layer = [[[IJSVGGroupLayer alloc] init] autorelease];
-        imageLayer = [[[IJSVGImageLayer alloc] initWithImage:image] autorelease];
+        layer = [[IJSVGGroupLayer alloc] init];
+        imageLayer = [[IJSVGImageLayer alloc] initWithImage:image];
         [layer addSublayer:imageLayer];
     }, NO);
     
@@ -116,8 +113,8 @@
     // this completely bypasses passing of files
     if((self = [super init]) != nil) {
         // keep the layer tree
-        _layerTree = [group retain];
-        _viewBox = viewBox;
+        self.layerTree = group;
+        self.viewBox = viewBox;
         
         // any setups
         [self _setupBasicsFromAnyInitializer];
@@ -225,34 +222,33 @@
         IJSVG * svg = nil;
         if( ( svg = [IJSVGCache cachedSVGForFileURL:aURL] ) != nil ) {
             // have to release, as this was called from an alloc..!
-            [self release];
-            return [svg retain];
+            return svg;
         }
     }
     
     // create the object
     if( ( self = [super init] ) != nil ) {
         NSError * anError = nil;
-        _delegate = delegate;
+        self.delegate = delegate;
         
         // this is a really quick check against the delegate
         // for methods that exist
         [self _checkDelegate];
         
         // create the group
-        _group = [[IJSVGParser groupForFileURL:aURL
+        self.group = [IJSVGParser groupForFileURL:aURL
                                          error:&anError
-                                      delegate:self] retain];
+                                      delegate:self];
         
         [self _setupBasicInfoFromGroup];
         [self _setupBasicsFromAnyInitializer];
         
         // something went wrong...
-        if( _group == nil ) {
+        if( self.group == nil ) {
             if( error != NULL ) {
                 *error = anError;
             }
-            [self release]; self = nil;
+             self = nil;
             return nil;
         }
         
@@ -290,11 +286,11 @@
         // this is basically the same as init with URL just
         // bypasses the loading of a file
         NSError * anError = nil;
-        _delegate = delegate;
+        self.delegate = delegate;
         [self _checkDelegate];
         
         // setup the parser
-        _group = [[IJSVGParser alloc] initWithSVGString:string
+        self.group = [[IJSVGParser alloc] initWithSVGString:string
                                                   error:&anError
                                                delegate:self];
         
@@ -302,11 +298,11 @@
         [self _setupBasicsFromAnyInitializer];
         
         // something went wrong :(
-        if(_group == nil) {
+        if(self.group == nil) {
             if(error != NULL) {
                 *error = anError;
             }
-            [self release]; self = nil;
+             self = nil;
             return nil;
         }
     }
@@ -320,51 +316,46 @@
     [self layer];
     
     // now clear memory
-    [_group release]; _group = nil;
+     self.group = nil;
 }
 
 - (void)_setupBasicInfoFromGroup
 {
     // store the viewbox
-    _viewBox = _group.viewBox;
-    _proposedViewSize = _group.proposedViewSize;
+    self.viewBox = self.group.viewBox;
+    self.proposedViewSize = self.group.proposedViewSize;
 }
 
 - (void)_setupBasicsFromAnyInitializer
 {
-    _lastProposedBackingScale = 1.f;
+    self.lastProposedBackingScale = 1.f;
 }
 
 - (NSString *)identifier
 {
-    return _group.identifier;
+    return self.group.identifier;
 }
 
 - (void)_checkDelegate
 {
-    _respondsTo.shouldHandleForeignObject = [_delegate respondsToSelector:@selector(svg:shouldHandleForeignObject:)];
-    _respondsTo.handleForeignObject = [_delegate respondsToSelector:@selector(svg:handleForeignObject:document:)];
-    _respondsTo.shouldHandleSubSVG = [_delegate respondsToSelector:@selector(svg:foundSubSVG:withSVGString:)];
-}
-
-- (NSRect)viewBox
-{
-    return _viewBox;
+    self.respondsTo_shouldHandleForeignObject = [self.delegate respondsToSelector:@selector(svg:shouldHandleForeignObject:)];
+    self.respondsTo_handleForeignObject = [self.delegate respondsToSelector:@selector(svg:handleForeignObject:document:)];
+    self.respondsTo_shouldHandleSubSVG = [self.delegate respondsToSelector:@selector(svg:foundSubSVG:withSVGString:)];
 }
 
 - (BOOL)isFont
 {
-    return [_group isFont];
+    return [self.group isFont];
 }
 
 - (NSArray *)glyphs
 {
-    return [_group glyphs];
+    return [self.group glyphs];
 }
 
 - (NSArray<IJSVG *> *)subSVGs:(BOOL)recursive
 {
-    return [_group subSVGs:recursive];
+    return [self.group subSVGs:recursive];
 }
 
 - (NSImage *)imageWithSize:(NSSize)aSize
@@ -394,7 +385,7 @@
                    flipped:(BOOL)flipped
                      error:(NSError **)error
 {
-    NSImage * im = [[[NSImage alloc] initWithSize:aSize] autorelease];
+    NSImage * im = [[NSImage alloc] initWithSize:aSize];
     [im lockFocus];
     CGContextRef ref = [[NSGraphicsContext currentContext] graphicsPort];
     CGContextSaveGState(ref);
@@ -419,7 +410,7 @@
 {
     return [self PDFDataWithRect:(NSRect){
         .origin=NSZeroPoint,
-        .size=_viewBox.size
+        .size=self.viewBox.size
     } error:error];
 }
 
@@ -433,7 +424,7 @@
                       error:(NSError **)error
 {
     // create the data for the PDF
-    NSMutableData * data = [[[NSMutableData alloc] init] autorelease];
+    NSMutableData * data = [[NSMutableData alloc] init];
     
     // assign the data to the consumer
     CGDataConsumerRef dataConsumer = CGDataConsumerCreateWithCFData((CFMutableDataRef)data);
@@ -500,7 +491,7 @@
     [self layer];
     
     // set the scale
-    __block NSView * weakView = view;
+    __weak NSView * weakView = view;
     self.renderingBackingScaleHelper = ^CGFloat{
         return weakView.window.screen.backingScaleFactor;
     };
@@ -538,7 +529,7 @@
 
 - (CGFloat)computeBackingScale:(CGFloat)actualScale
 {
-    return (CGFloat)(_scale + actualScale);
+    return (CGFloat)(self.scale + actualScale);
 }
 
 - (NSRect)computeRectDrawingInRect:(NSRect)rect
@@ -547,15 +538,15 @@
     // we also need to calculate the viewport so we can clip
     // the drawing if needed
     NSRect viewPort = NSZeroRect;
-    viewPort.origin.x = round(rect.size.width/2-(_proposedViewSize.width/2)*_clipScale);
-    viewPort.origin.y = round(rect.size.height/2-(_proposedViewSize.height/2)*_clipScale);;
-    viewPort.size.width = _proposedViewSize.width*_clipScale;
-    viewPort.size.height = _proposedViewSize.height*_clipScale;
+    viewPort.origin.x = round(rect.size.width/2-(self.proposedViewSize.width/2)*self.clipScale);
+    viewPort.origin.y = round(rect.size.height/2-(self.proposedViewSize.height/2)*self.clipScale);
+    viewPort.size.width = self.proposedViewSize.width*self.clipScale;
+    viewPort.size.height = self.proposedViewSize.height*self.clipScale;
     
     // check the viewport
-    if( NSEqualRects( _viewBox, NSZeroRect )
-       || _viewBox.size.width <= 0
-       || _viewBox.size.height <= 0
+    if( NSEqualRects( self.viewBox, NSZeroRect )
+       || self.viewBox.size.width <= 0
+       || self.viewBox.size.height <= 0
        || NSEqualRects( NSZeroRect, viewPort)
        || CGRectIsEmpty(viewPort)
        || CGRectIsNull(viewPort)
@@ -591,8 +582,8 @@
                 
             // scale the whole drawing context, but first, we need
             // to translate the context so its centered
-            CGFloat tX = round(rect.size.width/2-(_viewBox.size.width/2)*_scale);
-            CGFloat tY = round(rect.size.height/2-(_viewBox.size.height/2)*_scale);
+            CGFloat tX = round(rect.size.width/2-(self.viewBox.size.width/2)*self.scale);
+            CGFloat tY = round(rect.size.height/2-(self.viewBox.size.height/2)*self.scale);
             
             // we also need to calculate the viewport so we can clip
             // the drawing if needed
@@ -602,9 +593,9 @@
             // check the viewport
             if( !canDraw ) {
                 if( error != NULL ) {
-                    *error = [[[NSError alloc] initWithDomain:IJSVGErrorDomain
+                    *error = [[NSError alloc] initWithDomain:IJSVGErrorDomain
                                                          code:IJSVGErrorDrawing
-                                                     userInfo:nil] autorelease];
+                                                     userInfo:nil];
                 }
                 CGContextRestoreGState(ref);
                 return NO;
@@ -613,11 +604,11 @@
             // clip to mask
             CGContextClipToRect( ref, viewPort);
             
-            tX -= (_viewBox.origin.x*_scale);
-            tY -= (_viewBox.origin.y*_scale);
+            tX -= (self.viewBox.origin.x*self.scale);
+            tY -= (self.viewBox.origin.y*self.scale);
             
             CGContextTranslateCTM( ref, tX, tY );
-            CGContextScaleCTM( ref, _scale, _scale );
+            CGContextScaleCTM( ref, self.scale, self.scale );
             
             // render the layer, its really important we lock
             // the transaction when drawing
@@ -635,9 +626,9 @@
         @catch (NSException *exception) {
             // just catch and give back a drawing error to the caller
             if( error != NULL )
-                *error = [[[NSError alloc] initWithDomain:IJSVGErrorDomain
+                *error = [[NSError alloc] initWithDomain:IJSVGErrorDomain
                                                      code:IJSVGErrorDrawing
-                                                 userInfo:nil] autorelease];
+                                                 userInfo:nil];
         }
         @finally {
             CGContextRestoreGState(ref);
@@ -655,10 +646,10 @@
     
     // dont do anything, nothing has changed, no point of iterating over
     // every layer for no reason!
-    if(scale == _lastProposedBackingScale) {
+    if(scale == self.lastProposedBackingScale) {
         return;
     }
-    _lastProposedBackingScale = scale;
+    self.lastProposedBackingScale = scale;
     
     // walk the tree
     void (^block)(CALayer * layer, BOOL isMask) = ^void (CALayer * layer, BOOL isMask) {
@@ -675,70 +666,64 @@
 
 - (void)setFillColor:(NSColor *)aColor
 {
-    if(fillColor != nil) {
-        [fillColor release]; fillColor = nil;
-    }
-    fillColor = [aColor retain];
-    [_layerTree release]; _layerTree = nil;
+    _fillColor = aColor;
+     self.layerTree = nil;
 }
 
 - (void)setStrokeColor:(NSColor *)aColor
 {
-    if(strokeColor != nil) {
-        [strokeColor release]; strokeColor = nil;
-    }
-    strokeColor = [aColor retain];
-    [_layerTree release]; _layerTree = nil;
+    _strokeColor = aColor;
+     self.layerTree = nil;
 }
 
 - (void)setStrokeWidth:(CGFloat)aWidth
 {
-    strokeWidth = aWidth;
-    [_layerTree release]; _layerTree = nil;
+    _strokeWidth = aWidth;
+     self.layerTree = nil;
 }
 
 - (void)setLineCapStyle:(IJSVGLineCapStyle)aLineCapStyle
 {
-    lineCapStyle = aLineCapStyle;
-    [_layerTree release]; _layerTree = nil;
+    _lineCapStyle = aLineCapStyle;
+     self.layerTree = nil;
 }
 
 - (void)setLineJoinStyle:(IJSVGLineJoinStyle)aLineJoinStyle
 {
-    lineJoinStyle = aLineJoinStyle;
-    [_layerTree release]; _layerTree = nil;
+    _lineJoinStyle = aLineJoinStyle;
+     self.layerTree = nil;
 }
 
 - (IJSVGLayer *)layerWithTree:(IJSVGLayerTree *)tree
 {
     // clear memory
-    if(_layerTree != nil) {
-        [_layerTree release]; _layerTree = nil;
+    if(self.layerTree != nil) {
+         self.layerTree = nil;
     }
     
     // force rebuild of the tree
     IJSVGBeginTransactionLock();
-    _layerTree = [[tree layerForNode:_group] retain];
+    self.layerTree = [tree layerForNode:self.group];
     IJSVGEndTransactionLock();
-    return _layerTree;
+    return self.layerTree;
 }
 
 - (IJSVGLayer *)layer
 {
-    if(_layerTree != nil) {
-        return _layerTree;
+    if(self.layerTree != nil) {
+        return self.layerTree;
     }
     
     // create the renderer and assign default values
     // from this SVG object
-    IJSVGLayerTree * renderer = [[[IJSVGLayerTree alloc] init] autorelease];
+    IJSVGLayerTree * renderer = [[IJSVGLayerTree alloc] init];
     renderer.viewBox = self.viewBox;
     renderer.fillColor = self.fillColor;
     renderer.strokeColor = self.strokeColor;
     renderer.strokeWidth = self.strokeWidth;
     renderer.lineCapStyle = self.lineCapStyle;
     renderer.lineJoinStyle = self.lineJoinStyle;
-    renderer.replacementColors = _replacementColors;
+    renderer.replacementColors = self.replacementColorsInternal;
     
     // return the rendered layer
     return [self layerWithTree:renderer];
@@ -747,7 +732,7 @@
 - (NSArray<NSColor *> *)visibleColors
 {
     // set for the colors
-    NSMutableSet * colors = [[[NSMutableSet alloc] init] autorelease];
+    NSMutableSet * colors = [[NSMutableSet alloc] init];
     
     // block to find colors in stroke and fill
     void (^block)(CALayer * layer, BOOL isMask) = ^void (CALayer * layer, BOOL isMask) {
@@ -779,33 +764,33 @@
 
 - (void)removeAllReplacementColors
 {
-    [_replacementColors release]; _replacementColors = nil;
+     self.replacementColorsInternal = nil;
 }
 
 - (void)removeReplacementColor:(NSColor *)color
 {
-    if(_replacementColors == nil) {
+    if(self.replacementColorsInternal == nil) {
         return;
     }
-    [_replacementColors removeObjectForKey:[IJSVGColor computeColorSpace:color]];
+    [self.replacementColorsInternal removeObjectForKey:[IJSVGColor computeColorSpace:color]];
 }
 
 - (void)replaceColor:(NSColor *)color
            withColor:(NSColor *)newColor
 {
-    if(_replacementColors == nil) {
-        _replacementColors = [[NSMutableDictionary alloc] init];
+    if(self.replacementColorsInternal == nil) {
+        self.replacementColorsInternal = [[NSMutableDictionary alloc] init];
     }
     color = [IJSVGColor computeColorSpace:color];
     newColor = [IJSVGColor computeColorSpace:newColor];
-    _replacementColors[color] = newColor;
-    [_layerTree release]; _layerTree = nil;
+    self.replacementColorsInternal[color] = newColor;
+     self.layerTree = nil;
 }
 
 - (void)setReplacementColors:(NSDictionary<NSColor *, NSColor *> *)colors
 {
-    if(_replacementColors != nil) {
-        [_replacementColors release]; _replacementColors = nil;
+    if(self.replacementColorsInternal != nil) {
+         self.replacementColorsInternal = nil;
     }
     for(NSColor * oldColor in colors) {
         [self replaceColor:oldColor
@@ -819,14 +804,14 @@
     // rect, we need to work out the ratio scale in order
     // to transform the paths into our viewbox
     NSSize dest = rect.size;
-    NSSize source = _viewBox.size;
-    _clipScale = MIN(dest.width/_proposedViewSize.width,
-                     dest.height/_proposedViewSize.height);
+    NSSize source = self.viewBox.size;
+    self.clipScale = MIN(dest.width/self.proposedViewSize.width,
+                     dest.height/self.proposedViewSize.height);
    
     // work out the actual scale based on the clip scale
-    CGFloat w = _proposedViewSize.width*_clipScale;
-    CGFloat h = _proposedViewSize.height*_clipScale;
-    _scale = MIN(w/source.width,h/source.height);
+    CGFloat w = self.proposedViewSize.width*self.clipScale;
+    CGFloat h = self.proposedViewSize.height*self.clipScale;
+    self.scale = MIN(w/source.width,h/source.height);
 }
 
 #pragma mark NSPasteboard
@@ -850,8 +835,8 @@
       foundSubSVG:(IJSVG *)subSVG
     withSVGString:(NSString *)string
 {
-    if(_delegate != nil && _respondsTo.shouldHandleSubSVG == 1) {
-        [_delegate svg:self
+    if(self.delegate != nil && self.respondsTo_shouldHandleSubSVG == 1) {
+        [self.delegate svg:self
            foundSubSVG:subSVG
          withSVGString:string];
     }
@@ -860,8 +845,8 @@
 - (BOOL)svgParser:(IJSVGParser *)parser
 shouldHandleForeignObject:(IJSVGForeignObject *)foreignObject
 {
-    if( _delegate != nil && _respondsTo.shouldHandleForeignObject == 1 ) {
-        return [_delegate svg:self shouldHandleForeignObject:foreignObject];
+    if( self.delegate != nil && self.respondsTo_shouldHandleForeignObject == 1 ) {
+        return [self.delegate svg:self shouldHandleForeignObject:foreignObject];
     }
     return NO;
 }
@@ -870,8 +855,8 @@ shouldHandleForeignObject:(IJSVGForeignObject *)foreignObject
 handleForeignObject:(IJSVGForeignObject *)foreignObject
          document:(NSXMLDocument *)document
 {
-    if( _delegate != nil && _respondsTo.handleForeignObject == 1 ) {
-        [_delegate svg:self
+    if( self.delegate != nil && self.respondsTo_handleForeignObject == 1 ) {
+        [self.delegate svg:self
    handleForeignObject:foreignObject
               document:document];
     }

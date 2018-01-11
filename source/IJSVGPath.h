@@ -12,15 +12,9 @@
 
 @class IJSVGGroup;
 
-@interface IJSVGPath : IJSVGNode {
-    
-    NSBezierPath * path;
-    NSBezierPath * subpath;
-    CGPoint lastControlPoint;
-    
-}
+@interface IJSVGPath : IJSVGNode
 
-@property ( nonatomic, readonly ) NSBezierPath * path;
+@property ( weak, nonatomic, readonly ) NSBezierPath * path;
 @property ( nonatomic, readonly ) NSBezierPath * subpath;
 @property ( nonatomic, assign ) CGPoint lastControlPoint;
 

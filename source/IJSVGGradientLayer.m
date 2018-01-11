@@ -10,14 +10,6 @@
 
 @implementation IJSVGGradientLayer
 
-@synthesize gradient;
-
-- (void)dealloc
-{
-    [gradient release]; gradient = nil;
-    [super dealloc];
-}
-
 - (id)init
 {
     if((self = [super init]) != nil) {

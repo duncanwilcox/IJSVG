@@ -58,7 +58,7 @@
                                                 colorSpace:[NSColorSpace genericRGBColorSpace]];
     
     free(stopsParams);
-    return [grad autorelease];
+    return grad;
 }
 
 - (void)drawInContextRef:(CGContextRef)ctx

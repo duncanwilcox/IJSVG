@@ -10,16 +10,6 @@
 
 @implementation IJSVGPatternLayer
 
-@synthesize pattern;
-@synthesize patternNode;
-
-- (void)dealloc
-{
-    [pattern release]; pattern = nil;
-    [patternNode release]; patternNode = nil;
-    [super dealloc];
-}
-
 - (id)init
 {
     if((self = [super init]) != nil) {
@@ -30,7 +20,7 @@
 
 void IJSVGPatternDrawingCallBack(void * info, CGContextRef ctx) {
     // reassign the layer
-    IJSVGPatternLayer * layer = (IJSVGPatternLayer *)info;
+    IJSVGPatternLayer * layer = (__bridge IJSVGPatternLayer *)info;
     [layer.pattern renderInContext:ctx];
 };
 

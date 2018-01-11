@@ -8,13 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface IJSVGFontConverter : NSObject {
-    
-@private
-    NSURL * _url;
-    NSFont * _font;
-    NSMutableDictionary * _paths;
-}
+@interface IJSVGFontConverter : NSObject
 
 - (id)initWithFontAtFileURL:(NSURL *)url;
 - (NSDictionary *)paths;

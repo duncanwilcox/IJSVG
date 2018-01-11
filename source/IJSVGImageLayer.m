@@ -26,7 +26,7 @@
 {
     if((self = [super init]) != nil) {
         // set the contents
-        self.contents = (id)imageRef;
+        self.contents = (id)CFBridgingRelease(imageRef);
         
         // make sure we say we need help
         self.requiresBackingScaleHelp = YES;

@@ -31,44 +31,44 @@
     NSXMLElement * root = [[self class] rootElementForPath:path];
     
     // create the path data
-    NSXMLElement * p = [[[NSXMLElement alloc] initWithName:@"path"] autorelease];
+    NSXMLElement * p = [[NSXMLElement alloc] initWithName:@"path"];
     
     // add the drawing command
-    NSXMLNode * n = [[[NSXMLNode alloc] initWithKind:NSXMLAttributeKind] autorelease];
+    NSXMLNode * n = [[NSXMLNode alloc] initWithKind:NSXMLAttributeKind];
     [n setName:@"d"];
     [n setStringValue:[[self class] SVGPathStringForBezierPath:path]];
     [p addAttribute:n];
     
     // add the drawing path to the root
     [root addChild:p];
-    return [[[NSXMLDocument alloc] initWithRootElement:root] autorelease];
+    return [[NSXMLDocument alloc] initWithRootElement:root];
 }
 
 + (NSXMLElement *)rootElementForPath:(NSBezierPath *)path
 {
-    NSXMLElement * element = [[[NSXMLElement alloc] initWithName:@"svg"] autorelease];
+    NSXMLElement * element = [[NSXMLElement alloc] initWithName:@"svg"];
     NSRect bounds = path.controlPointBounds;
     
     // width
-    NSXMLNode * att = [[[NSXMLNode alloc] initWithKind:NSXMLAttributeKind] autorelease];
+    NSXMLNode * att = [[NSXMLNode alloc] initWithKind:NSXMLAttributeKind];
     [att setName:@"width"];
     [att setStringValue:[NSString stringWithFormat:@"%f",bounds.size.width]];
     [element addAttribute:att];
     
     // height
-    att = [[[NSXMLNode alloc] initWithKind:NSXMLAttributeKind] autorelease];
+    att = [[NSXMLNode alloc] initWithKind:NSXMLAttributeKind];
     [att setName:@"height"];
     [att setStringValue:[NSString stringWithFormat:@"%f",bounds.size.height]];
     [element addAttribute:att];
     
     // viewbox
-    att = [[[NSXMLNode alloc] initWithKind:NSXMLAttributeKind] autorelease];
+    att = [[NSXMLNode alloc] initWithKind:NSXMLAttributeKind];
     [att setName:@"viewBox"];
     [att setStringValue:[NSString stringWithFormat:@"%f %f %f %f",bounds.origin.x,bounds.origin.y,bounds.size.width,bounds.size.height]];
     [element addAttribute:att];
     
     // namespace
-    att = [[[NSXMLNode alloc] initWithKind:NSXMLAttributeKind] autorelease];
+    att = [[NSXMLNode alloc] initWithKind:NSXMLAttributeKind];
     [att setName:@"xmlns"];
     [att setStringValue:@"http://www.w3.org/2000/svg"];
     [element addAttribute:att];
@@ -77,7 +77,7 @@
 
 + (NSString *)SVGPathStringForBezierPath:(NSBezierPath *)path
 {
-    NSMutableString * str = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString * str = [[NSMutableString alloc] init];
     for( NSInteger i = 0; i < path.elementCount; i++ )
     {
         NSBezierPathElement element = [path elementAtIndex:i];

@@ -10,14 +10,18 @@
 #import "IJSVGPath.h"
 #import "IJSVGTransform.h"
 
+@interface IJSVGImage ()
+@property (nonatomic, strong) NSImage *image;
+@property (nonatomic, assign) CGImageRef CGImage;
+@property (nonatomic, strong) IJSVGPath *imagePath;
+@end
+
 @implementation IJSVGImage
 
 - (void)dealloc
 {
-    CGImageRelease(CGImage); CGImage = nil;
-    [imagePath release]; imagePath = nil;
-    [image release]; image = nil;
-    [super dealloc];
+    CGImageRelease(self.CGImage);
+    self.CGImage = nil;
 }
 
 - (void)loadFromBase64EncodedString:(NSString *)encodedString
@@ -31,45 +35,45 @@
     }
     
     // set the image against the container
-    NSImage * anImage = [[[NSImage alloc] initWithData:data] autorelease];
+    NSImage * anImage = [[NSImage alloc] initWithData:data];
     [self setImage:anImage];
 }
 
 - (IJSVGPath *)path
 {
-    if(imagePath == nil) {
+    if(self.imagePath == nil) {
         // lazy load the path as it might not be needed
-        imagePath = [[IJSVGPath alloc] init];
-        [imagePath.path appendBezierPathWithRect:NSMakeRect(0.f, 0.f, self.width.value, self.height.value)];
-        [imagePath close];
+        self.imagePath = [[IJSVGPath alloc] init];
+        [self.imagePath.path appendBezierPathWithRect:NSMakeRect(0.f, 0.f, self.width.value, self.height.value)];
+        [self.imagePath close];
     }
-    return imagePath;
+    return self.imagePath;
 }
 
 - (void)setImage:(NSImage *)anImage
 {
-    if(image != nil) {
-        [image release]; image = nil;
+    if(self.image != nil) {
+         self.image = nil;
     }
-    image = [anImage retain];
+    self.image = anImage;
     
-    if(CGImage != nil) {
-        CGImageRelease(CGImage);
-        CGImage = nil;
+    if(self.CGImage != nil) {
+        CGImageRelease(self.CGImage);
+        self.CGImage = nil;
     }
     
     NSRect rect = NSMakeRect( 0.f, 0.f, self.width.value, self.height.value);
-    CGImage = [image CGImageForProposedRect:&rect
+    self.CGImage = [self.image CGImageForProposedRect:&rect
                                     context:nil
                                       hints:nil];
     
     // be sure to retain (some reason this is required in Xcode 8 beta 5?)
-    CGImageRetain(CGImage);
+    CGImageRetain(self.CGImage);
 }
 
 - (CGImageRef)CGImage
 {
-    return CGImage;
+    return self.CGImage;
 }
 
 - (void)drawInContextRef:(CGContextRef)context
@@ -95,7 +99,7 @@
         // flip the coordinates
         CGContextTranslateCTM(context, rect.origin.x, (rect.origin.y)+rect.size.height);
         CGContextScaleCTM(context, 1.f, -1.f);
-        CGContextDrawImage( context, bounds, CGImage);
+        CGContextDrawImage(context, bounds, self.CGImage);
     }
     CGContextRestoreGState(context);
 }

@@ -37,25 +37,9 @@ typedef NS_OPTIONS( NSInteger, IJSVGExporterOptions) {
         IJSVGExporterOptionCompressOutput
 };
 
-@interface IJSVGExporter : NSObject {
-    
-@private
-    IJSVG * _svg;
-    CGSize _size;
-    IJSVGExporterOptions _options;
-    NSXMLDocument * _dom;
-    NSXMLElement * _defElement;
-    NSInteger _gradCount;
-    NSInteger _patternCount;
-    NSInteger _imageCount;
-    NSInteger _maskCount;
-    NSInteger _pathCount;
-    NSXMLElement * _scaledRootNode;
-    
-}
+@interface IJSVGExporter : NSObject
 
 @property (nonatomic, copy) NSString * title;
-@property (nonatomic, copy) NSString * description;
 
 - (id)initWithSVG:(IJSVG *)svg
              size:(CGSize)size

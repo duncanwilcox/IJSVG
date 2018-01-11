@@ -10,9 +10,7 @@
 #import <sys/stat.h>
 #import "IJSVG.h"
 
-@interface IJSVGCache : NSObject {
-    
-}
+@interface IJSVGCache : NSObject
 
 + (IJSVG *)cachedSVGForFileURL:(NSURL *)aURL;
 + (void)cacheSVG:(IJSVG *)svg fileURL:(NSURL *)aURL;

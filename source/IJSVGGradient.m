@@ -10,27 +10,17 @@
 
 @implementation IJSVGGradient
 
-@synthesize gradient, CGGradient;
-@synthesize angle, startPoint, endPoint;
-@synthesize x1, x2, y1, y2;
-
 - (void)dealloc
 {
-    [x1 release]; x1 = nil;
-    [x2 release]; x2 = nil;
-    [y1 release]; y1 = nil;
-    [y2 release]; y2 = nil;
-    [gradient release]; gradient = nil;
-    if( CGGradient != nil ) {
-        CGGradientRelease(CGGradient);
+    if( self.CGGradient != nil ) {
+        CGGradientRelease(self.CGGradient);
     }
-    [super dealloc];
 }
 
 - (id)copyWithZone:(NSZone *)zone
 {
     IJSVGGradient * clone = [super copyWithZone:zone];
-    clone.gradient = [[self.gradient copy] autorelease];
+    clone.gradient = [self.gradient copy];
     clone.startPoint = self.startPoint;
     clone.endPoint = self.endPoint;
     return clone;
@@ -43,7 +33,7 @@
     NSArray * stops = [element nodesForXPath:@"stop"
                                        error:nil];
     
-    NSMutableArray * colors = [[[NSMutableArray alloc] initWithCapacity:stops.count] autorelease];
+    NSMutableArray * colors = [[NSMutableArray alloc] initWithCapacity:stops.count];
     CGFloat * stopsParams = (CGFloat *)malloc(stops.count*sizeof(CGFloat));
     NSInteger i = 0;
     for( NSXMLElement * stop in stops )
@@ -112,10 +102,10 @@
 - (CGGradientRef)CGGradient
 {
     // store it in the cache
-    if(CGGradient != nil) {
-        return CGGradient;
+    if(_CGGradient != nil) {
+        return _CGGradient;
     }
-    
+
     // actually create the gradient
     NSInteger num = self.gradient.numberOfColorStops;
     CGFloat * locations = malloc(sizeof(CGFloat)*num);
@@ -130,7 +120,7 @@
     CGGradientRef result = CGGradientCreateWithColors(self.gradient.colorSpace.CGColorSpace, colors, locations);
     CFRelease(colors);
     free(locations);
-    return CGGradient = result;
+    return _CGGradient = result;
 }
 
 - (void)drawInContextRef:(CGContextRef)ctx

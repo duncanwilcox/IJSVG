@@ -11,13 +11,7 @@
 
 @class IJSVGPath;
 
-@interface IJSVGImage : IJSVGNode {
-    
-    NSImage * image;
-    CGImageRef CGImage;
-    IJSVGPath * imagePath;
-    
-}
+@interface IJSVGImage : IJSVGNode
 
 - (CGImageRef)CGImage;
 - (void)drawInContextRef:(CGContextRef)context

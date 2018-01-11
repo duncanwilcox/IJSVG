@@ -9,29 +9,27 @@
 #import "IJSVGFontConverter.h"
 #import "IJSVGBezierPathAdditions.h"
 
-@implementation IJSVGFontConverter
+@interface IJSVGFontConverter ()
+@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSFont *font;
+@property (nonatomic, strong) NSMutableDictionary *pathsInternal;
+@end
 
-- (void)dealloc
-{
-    [_paths release]; _paths = nil;
-    [_url release]; _url = nil;
-    [_font release]; _font = nil;
-    [super dealloc];
-}
+@implementation IJSVGFontConverter
 
 - (id)initWithFontAtFileURL:(NSURL *)url
 {
     if( ( self = [super init] ) != nil )
     {
-        _url = [url copy];
+        self.url = [url copy];
         
         // load the font
-        CGDataProviderRef dataProvider = CGDataProviderCreateWithURL((CFURLRef)_url);
+        CGDataProviderRef dataProvider = CGDataProviderCreateWithURL((CFURLRef)self.url);
         CGFontRef fontRef = CGFontCreateWithDataProvider(dataProvider);
         CTFontRef font = CTFontCreateWithGraphicsFont( fontRef, 30.f, NULL, NULL );
         
         // toll free bridge between NSFont at CTFont :)
-        _font = [(NSFont *)font copy];
+        self.font = [(__bridge NSFont *)font copy];
         CGFontRelease(fontRef);
         CGDataProviderRelease(dataProvider);
         CFRelease(font);
@@ -39,15 +37,10 @@
     return self;
 }
 
-- (NSFont *)font
-{
-    return _font;
-}
-
 - (NSArray *)allCharacters
 {
-    NSCharacterSet * charSet = _font.coveredCharacterSet;
-    NSMutableArray * array = [[[NSMutableArray alloc] init] autorelease];
+    NSCharacterSet * charSet = self.font.coveredCharacterSet;
+    NSMutableArray * array = [[NSMutableArray alloc] init];
     for( int plane = 0; plane <= 16; plane++ )
     {
         if( [charSet hasMemberInPlane:plane] )
@@ -59,9 +52,9 @@
                 {
                     UTF32Char c1 = NSSwapHostIntToLittle(c);
                     // add it...
-                    [array addObject:[[[NSString alloc] initWithBytes:&c1
+                    [array addObject:[[NSString alloc] initWithBytes:&c1
                                                                length:4
-                                                             encoding:NSUTF32LittleEndianStringEncoding] autorelease]];
+                                                             encoding:NSUTF32LittleEndianStringEncoding]];
                 }
             }
         }
@@ -72,11 +65,11 @@
 - (void)generateMap
 {
     // we have already been made!
-    if( _paths.count != 0 )
+    if( self.pathsInternal.count != 0 )
         return;
     
-    _paths = [[NSMutableDictionary alloc] init];
-    CTFontRef font = (CTFontRef)_font;
+    self.pathsInternal = [[NSMutableDictionary alloc] init];
+    CTFontRef font = (__bridge CTFontRef)self.font;
     for( NSString * charString in [self allCharacters] )
     {
         // get the characters in each char
@@ -102,19 +95,19 @@
 - (void)parseCGPath:(CGPathRef)path
  forCharacterString:(NSString *)string
 {
-    [_paths setObject:[[self class] bezierpathFromCGPath:path]
+    [self.pathsInternal setObject:[[self class] bezierpathFromCGPath:path]
                forKey:string];
 }
 
 - (NSDictionary *)paths
 {
     [self generateMap];
-    return _paths;
+    return self.pathsInternal;
 }
 
 static void IJSVGCGPathCallback(void * info, const CGPathElement * element)
 {
-    NSBezierPath * path = (NSBezierPath *)info;
+    NSBezierPath * path = (__bridge NSBezierPath *)info;
     CGPoint * points = element->points;
     switch( element->type )
     {
@@ -161,7 +154,7 @@ static void IJSVGCGPathCallback(void * info, const CGPathElement * element)
     NSBezierPath * bezPath = [NSBezierPath bezierPath];
     
     // pass the path
-    CGPathApply( path, bezPath, IJSVGCGPathCallback );
+    CGPathApply( path, (__bridge void * _Nullable)(bezPath), IJSVGCGPathCallback );
     
     // the glyph will be upside down, so we need to turn it up the right way!
     NSAffineTransform * trans = [NSAffineTransform transform];

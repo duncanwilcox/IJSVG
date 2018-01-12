@@ -10,15 +10,6 @@
 #import "IJSVGUtils.h"
 
 @interface IJSVGCommand ()
-//    NSString * commandString;
-//    NSString * command;
-//    CGFloat * parameters;
-//    NSInteger parameterCount;
-//    NSMutableArray * subCommands;
-//    NSInteger requiredParameters;
-//    IJSVGCommandType type;
-//    IJSVGCommand * __weak previousCommand;
-//    Class<IJSVGCommandProtocol> commandClass;
 @property (nonatomic, assign) NSInteger currentIndex;
 @end
 

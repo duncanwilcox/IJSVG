@@ -529,6 +529,8 @@
                 [self _parseBaseBlock:childDef
                             intoGroup:self
                                   def:NO];
+            } else if(childType == IJSVGNodeTypeNotFound) {
+                // ignore
             } else {
                 // just a default def, continue on, as we are a def element,
                 // store these seperately to the default ID string ones

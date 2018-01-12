@@ -15,6 +15,7 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool {
         if(argc > 1)
         {
+            printf("%s\n", argv[1]);
             NSString *fn = [NSString stringWithUTF8String:argv[1]];
             NSData *svgdata = [NSData dataWithContentsOfFile:fn];
             NSString *svg = [[NSString alloc] initWithData:svgdata encoding:NSUTF8StringEncoding];

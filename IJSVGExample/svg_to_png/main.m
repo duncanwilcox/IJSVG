@@ -30,9 +30,10 @@ int main(int argc, const char * argv[]) {
 
 void saveImage(NSImage *image, NSString *path)
 {
-    CGImageRef cgRef = [image CGImageForProposedRect:NULL context:nil hints:nil];
-    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-    [newRep setSize:[image size]];
-    NSData *pngData = [newRep representationUsingType:NSPNGFileType properties:@{}];
+    [image lockFocus];
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, image.size.width, image.size.height)];
+    [image unlockFocus];
+        
+    NSData *pngData = [bitmapRep representationUsingType:NSPNGFileType properties:@{}];
     [pngData writeToFile:path atomically:YES];
 }

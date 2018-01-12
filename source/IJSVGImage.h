@@ -13,7 +13,8 @@
 
 @interface IJSVGImage : IJSVGNode
 
-- (CGImageRef)CGImage;
+@property (nonatomic, strong) id CGImage;
+
 - (void)drawInContextRef:(CGContextRef)context
                     path:(IJSVGPath *)path;
 - (void)loadFromBase64EncodedString:(NSString *)encodedString;

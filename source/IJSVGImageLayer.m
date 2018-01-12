@@ -19,14 +19,15 @@
     CGImageRef ref = [image CGImageForProposedRect:&rect
                                            context:nil
                                              hints:nil];
-    return [self initWithCGImage:ref];
+    return [self initWithCGImage:(__bridge id)ref];
 }
 
-- (id)initWithCGImage:(CGImageRef)imageRef
+- (id)initWithCGImage:(id)imageRef
 {
-    if((self = [super init]) != nil) {
+    if((self = [super init]) != nil)
+    {
         // set the contents
-        self.contents = (id)CFBridgingRelease(imageRef);
+        self.contents = imageRef;
         
         // make sure we say we need help
         self.requiresBackingScaleHelp = YES;
@@ -34,8 +35,8 @@
         // set the frame, simple stuff
         self.frame = (CGRect){
             .origin = CGPointZero,
-            .size = CGSizeMake( CGImageGetWidth(imageRef),
-                                CGImageGetHeight(imageRef))
+            .size = CGSizeMake( CGImageGetWidth((CGImageRef)imageRef),
+                                CGImageGetHeight((CGImageRef)imageRef))
         };
     }
     return self;

@@ -9,11 +9,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import "IJSVGLayer.h"
 
-@interface IJSVGImageLayer : IJSVGLayer {
-    
-}
+@interface IJSVGImageLayer : IJSVGLayer
 
 - (id)initWithImage:(NSImage *)image;
-- (id)initWithCGImage:(CGImageRef)imageRef;
+- (id)initWithCGImage:(id)imageRef;
 
 @end

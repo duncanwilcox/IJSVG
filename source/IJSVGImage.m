@@ -12,17 +12,10 @@
 
 @interface IJSVGImage ()
 @property (nonatomic, strong) NSImage *image;
-@property (nonatomic, assign) CGImageRef CGImage;
 @property (nonatomic, strong) IJSVGPath *imagePath;
 @end
 
 @implementation IJSVGImage
-
-- (void)dealloc
-{
-    CGImageRelease(self.CGImage);
-    self.CGImage = nil;
-}
 
 - (void)loadFromBase64EncodedString:(NSString *)encodedString
 {
@@ -54,19 +47,8 @@
 - (void)setImage:(NSImage *)anImage
 {
     _image = anImage;
-    
-    if(self.CGImage != nil) {
-        CGImageRelease(self.CGImage);
-        self.CGImage = nil;
-    }
-    
     NSRect rect = NSMakeRect( 0.f, 0.f, self.width.value, self.height.value);
-    self.CGImage = [self.image CGImageForProposedRect:&rect
-                                    context:nil
-                                      hints:nil];
-    
-    // be sure to retain (some reason this is required in Xcode 8 beta 5?)
-    CGImageRetain(self.CGImage);
+    self.CGImage = (__bridge id)([self.image CGImageForProposedRect:&rect context:nil hints:nil]);
 }
 
 - (void)drawInContextRef:(CGContextRef)context
@@ -92,7 +74,7 @@
         // flip the coordinates
         CGContextTranslateCTM(context, rect.origin.x, (rect.origin.y)+rect.size.height);
         CGContextScaleCTM(context, 1.f, -1.f);
-        CGContextDrawImage(context, bounds, self.CGImage);
+        CGContextDrawImage(context, bounds, (CGImageRef)self.CGImage);
     }
     CGContextRestoreGState(context);
 }

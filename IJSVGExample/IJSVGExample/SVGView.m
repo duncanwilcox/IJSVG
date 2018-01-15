@@ -19,18 +19,27 @@
 {
     if( ( self = [super initWithFrame:frameRect] ) != nil )
     {
-        __weak SVGView *weakSelf = self;
-        self.svg = [self svg];
-        self.svg.renderingBackingScaleHelper = ^{
-            return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
-        };
+        [self loadSVGNamed:@"test"];
     }
     return self;
 }
 
-- (IJSVG *)svg
+- (void)loadSVGNamed:(NSString *)name
 {
-    return [IJSVG svgNamed:@"test"];
+    __weak SVGView *weakSelf = self;
+    self.svg = [IJSVG svgNamed:name];
+    self.svg.renderingBackingScaleHelper = ^{
+        return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
+    };
+}
+
+- (void)loadSVGFile:(NSString *)file
+{
+    __weak SVGView *weakSelf = self;
+    self.svg = [[IJSVG alloc] initWithFile:file];
+    self.svg.renderingBackingScaleHelper = ^{
+        return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
+    };
 }
 
 - (void)drawRect:(NSRect)dirtyRect

@@ -10,4 +10,6 @@
 #import "IJSVG.h"
 
 @interface SVGView : NSView
+- (void)loadSVGFile:(NSString *)file;
+- (void)loadSVGNamed:(NSString *)name;
 @end

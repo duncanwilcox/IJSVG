@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2657" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,6 +15,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="svgView" destination="hhC-1S-CCX" id="AAU-F9-pBE"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -76,7 +77,7 @@
                             </menuItem>
                             <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                 <connections>
-                                    <action selector="openDocument:" target="-1" id="bVn-NM-KNZ"/>
+                                    <action selector="openDocument:" target="Voe-Tx-rLC" id="Hm3-c7-KEI"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Open Recent" id="tXI-mr-wws">
@@ -626,6 +627,55 @@
                                     <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="iAo-at-Kv3"/>
+                            <menuItem title="Load test.svg" id="Shv-p7-FTe">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="IKl-uf-ywP"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load css.svg" tag="1" id="So1-8O-cu4">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="Pjr-93-UZU"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load clipped.svg" tag="2" id="ou3-cX-MDN">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="Yps-Fu-YdQ"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load htc_one.svg" tag="3" id="hli-ZH-gMb">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="ik1-Gd-7q9"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load products.svg" tag="4" id="PQl-TL-BVW">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="9qb-Qd-2u0"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load paperplane.svg" tag="5" id="4cH-D0-6II">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="479-EW-PmQ"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load linecap.svg" tag="6" id="IOk-1B-451">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="TX7-0a-8KB"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Load dashed.svg" tag="7" id="ltC-pO-70i">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="loadSVGFromMenu:" target="Voe-Tx-rLC" id="G0E-Ru-fDl"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -683,7 +733,7 @@
                     </customView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="184" y="628"/>
+            <point key="canvasLocation" x="193" y="845"/>
         </window>
     </objects>
 </document>

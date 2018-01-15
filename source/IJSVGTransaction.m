@@ -7,6 +7,7 @@
 //
 
 #import "IJSVGTransaction.h"
+#import <QuartzCore/QuartzCore.h>
 
 void IJSVGBeginTransactionLock() {
     [CATransaction begin];

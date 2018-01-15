@@ -15,15 +15,6 @@
 
 @implementation SVGView
 
-- (id)initWithFrame:(NSRect)frameRect
-{
-    if( ( self = [super initWithFrame:frameRect] ) != nil )
-    {
-        [self loadSVGNamed:@"test"];
-    }
-    return self;
-}
-
 - (void)loadSVGNamed:(NSString *)name
 {
     __weak SVGView *weakSelf = self;
@@ -31,6 +22,7 @@
     self.svg.renderingBackingScaleHelper = ^{
         return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
     };
+    [self setNeedsDisplay:YES];
 }
 
 - (void)loadSVGFile:(NSString *)file
@@ -40,12 +32,15 @@
     self.svg.renderingBackingScaleHelper = ^{
         return [weakSelf.svg computeBackingScale:weakSelf.window.backingScaleFactor];
     };
+    [self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
     CGContextRef ref = [[NSGraphicsContext currentContext] graphicsPort];
     CGContextSaveGState(ref);
+    CGContextSetRGBFillColor(ref, 1, 1, 1, 1);
+    CGContextFillRect(ref, self.bounds);
     CGContextTranslateCTM( ref, 0, self.bounds.size.height);
     CGContextScaleCTM( ref, 1, -1 );
     [self.svg drawInRect:self.bounds];

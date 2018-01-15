@@ -122,6 +122,7 @@
 		AE57F0362008220D0051420C /* IJSVGMath.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E8ABF81E219C860032A80C /* IJSVGMath.m */; };
 		AE57F0372008220D0051420C /* IJSVGStrokeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 597046A11E24352700A60138 /* IJSVGStrokeLayer.m */; };
 		AE57F0382008220D0051420C /* IJSVGUnitLength.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E0F5EC1E29964700F757F7 /* IJSVGUnitLength.m */; };
+		AE57F043200D66AE0051420C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE57F042200D66AD0051420C /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -272,6 +273,7 @@
 		59F799E119B880CE00096CB7 /* htc_one.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = htc_one.svg; sourceTree = "<group>"; };
 		AE57F0002008218C0051420C /* svg_to_png */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = svg_to_png; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE57F0022008218C0051420C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AE57F042200D66AD0051420C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,6 +295,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE57F043200D66AE0051420C /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,6 +309,7 @@
 				5956658D19B62F4700D805FF /* IJSVGExampleTests */,
 				AE57F0012008218C0051420C /* svg_to_png */,
 				5956657819B62F4600D805FF /* Products */,
+				AE57F041200D66AD0051420C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -493,6 +497,14 @@
 				AE57F0022008218C0051420C /* main.m */,
 			);
 			path = svg_to_png;
+			sourceTree = "<group>";
+		};
+		AE57F041200D66AD0051420C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AE57F042200D66AD0051420C /* WebKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

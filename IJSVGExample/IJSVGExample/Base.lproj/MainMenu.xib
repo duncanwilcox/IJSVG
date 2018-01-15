@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,6 +17,7 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
                 <outlet property="svgView" destination="hhC-1S-CCX" id="AAU-F9-pBE"/>
+                <outlet property="webView" destination="xtQ-7R-2lf" id="eNZ-VB-dgQ"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -611,23 +613,10 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="View" id="H8h-7b-M4v">
+                <menuItem title="Samples" id="pBd-Zr-GiE">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="View" id="HyV-fh-RgO">
+                    <menu key="submenu" title="Samples" id="1bq-2u-Fkw">
                         <items>
-                            <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
-                                <connections>
-                                    <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Customize Toolbar…" id="1UK-8n-QPP">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="iAo-at-Kv3"/>
                             <menuItem title="Load test.svg" id="Shv-p7-FTe">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -679,6 +668,25 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="View" id="H8h-7b-M4v">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="View" id="HyV-fh-RgO">
+                        <items>
+                            <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Customize Toolbar…" id="1UK-8n-QPP">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Window" id="aUF-d1-5bR">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
@@ -721,19 +729,35 @@
         <window title="IJSVGExample" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="556" height="679"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="contentRect" x="335" y="390" width="556" height="396"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="556" height="679"/>
+                <rect key="frame" x="0.0" y="0.0" width="556" height="396"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView misplaced="YES" id="hhC-1S-CCX" customClass="SVGView">
-                        <rect key="frame" x="0.0" y="0.0" width="556" height="679"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="hhC-1S-CCX" customClass="SVGView">
+                        <rect key="frame" x="0.0" y="0.0" width="278" height="396"/>
                     </customView>
+                    <webView translatesAutoresizingMaskIntoConstraints="NO" id="xtQ-7R-2lf">
+                        <rect key="frame" x="278" y="0.0" width="278" height="396"/>
+                        <webPreferences key="preferences" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0" plugInsEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
+                            <nil key="identifier"/>
+                        </webPreferences>
+                    </webView>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="hhC-1S-CCX" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="1gH-fF-u2H"/>
+                    <constraint firstAttribute="bottom" secondItem="xtQ-7R-2lf" secondAttribute="bottom" id="Fk1-eL-cfl"/>
+                    <constraint firstItem="xtQ-7R-2lf" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="JLG-0w-qau"/>
+                    <constraint firstAttribute="bottom" secondItem="hhC-1S-CCX" secondAttribute="bottom" id="PIB-o8-Zva"/>
+                    <constraint firstItem="hhC-1S-CCX" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="VG7-Yr-IUh"/>
+                    <constraint firstItem="xtQ-7R-2lf" firstAttribute="leading" secondItem="hhC-1S-CCX" secondAttribute="trailing" id="Vxq-sW-74p"/>
+                    <constraint firstItem="xtQ-7R-2lf" firstAttribute="leading" secondItem="hhC-1S-CCX" secondAttribute="trailing" id="nce-iV-Ui6"/>
+                    <constraint firstItem="xtQ-7R-2lf" firstAttribute="width" secondItem="hhC-1S-CCX" secondAttribute="width" id="uqG-4W-M1b"/>
+                    <constraint firstAttribute="trailing" secondItem="xtQ-7R-2lf" secondAttribute="trailing" id="zra-U7-N8G"/>
+                </constraints>
             </view>
-            <point key="canvasLocation" x="193" y="845"/>
+            <point key="canvasLocation" x="193" y="703"/>
         </window>
     </objects>
 </document>

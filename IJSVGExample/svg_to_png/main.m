@@ -20,8 +20,7 @@ int main(int argc, const char * argv[]) {
             NSData *svgdata = [NSData dataWithContentsOfFile:fn];
             NSString *svg = [[NSString alloc] initWithData:svgdata encoding:NSUTF8StringEncoding];
             IJSVG *ijsvg = [[IJSVG alloc] initWithSVGString:svg error:nil];
-            NSRect v = ijsvg.viewBox;
-            NSImage *i = [ijsvg imageWithSize:CGSizeMake(v.size.width * 3, v.size.height * 3) flipped:YES];
+            NSImage *i = [ijsvg imageWithSize:CGSizeMake(ceil(ijsvg.viewBox.size.width * 3), ceil(ijsvg.viewBox.size.height * 3)) flipped:YES];
             fn = [[fn stringByDeletingPathExtension] stringByAppendingPathExtension:@"png"];
             saveImage(i, fn);
         }
@@ -34,7 +33,11 @@ void saveImage(NSImage *image, NSString *path)
     [image lockFocus];
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, image.size.width, image.size.height)];
     [image unlockFocus];
-        
-    NSData *pngData = [bitmapRep representationUsingType:NSPNGFileType properties:@{}];
+    
+    bitmapRep =
+        [bitmapRep bitmapImageRepByConvertingToColorSpace:[NSColorSpace genericRGBColorSpace]
+                                          renderingIntent:NSColorRenderingIntentDefault];
+    
+    NSData *pngData = [bitmapRep representationUsingType:NSPNGFileType properties:@{NSImageColorSyncProfileData:[NSColorSpace genericRGBColorSpace]}];
     [pngData writeToFile:path atomically:YES];
 }

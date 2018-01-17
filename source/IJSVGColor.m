@@ -199,6 +199,8 @@ static NSMutableDictionary * _colorTree = nil;
 
 + (NSColor *)colorFromString:(NSString *)string
 {
+    string = [string stringByTrimmingCharactersInSet:
+                 [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if( [string length] < 3 )
         return nil;
  

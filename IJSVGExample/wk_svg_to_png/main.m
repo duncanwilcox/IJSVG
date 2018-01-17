@@ -31,12 +31,12 @@ int main(int argc, const char * argv[]) {
             printf("%s\n", argv[1]);
             
             NSString *fn = [NSString stringWithUTF8String:argv[1]];
-            NSData *svgdata = [NSData dataWithContentsOfFile:fn];
-            NSString *svg = [[NSString alloc] initWithData:svgdata encoding:NSUTF8StringEncoding];
-            IJSVG *ijsvg = [[IJSVG alloc] initWithSVGString:svg error:nil];
-            
-            NSRect r = NSMakeRect(0, 0, ceil(ijsvg.viewBox.size.width * 3), ceil(ijsvg.viewBox.size.height * 3));
-            
+//            NSData *svgdata = [NSData dataWithContentsOfFile:fn];
+//            NSString *svg = [[NSString alloc] initWithData:svgdata encoding:NSUTF8StringEncoding];
+//            IJSVG *ijsvg = [[IJSVG alloc] initWithSVGString:svg error:nil];
+//            NSRect r = NSMakeRect(0, 0, ceil(ijsvg.viewBox.size.width * 3), ceil(ijsvg.viewBox.size.height * 3));
+            NSRect r = NSMakeRect(0, 0, 400, 400);
+
             WebView *wv = [[WebView alloc] initWithFrame:r];
             [wv setDrawsBackground:NO];
             Loader *l = [[Loader alloc] init];

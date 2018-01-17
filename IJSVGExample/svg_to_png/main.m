@@ -20,7 +20,9 @@ int main(int argc, const char * argv[]) {
             NSData *svgdata = [NSData dataWithContentsOfFile:fn];
             NSString *svg = [[NSString alloc] initWithData:svgdata encoding:NSUTF8StringEncoding];
             IJSVG *ijsvg = [[IJSVG alloc] initWithSVGString:svg error:nil];
-            NSImage *i = [ijsvg imageWithSize:CGSizeMake(ceil(ijsvg.viewBox.size.width * 3), ceil(ijsvg.viewBox.size.height * 3)) flipped:YES];
+//            NSSize s = CGSizeMake(ceil(ijsvg.viewBox.size.width * 3), ceil(ijsvg.viewBox.size.height * 3));
+            NSSize s = CGSizeMake(400, 400);
+            NSImage *i = [ijsvg imageWithSize:s flipped:YES];
             fn = [[fn stringByDeletingPathExtension] stringByAppendingPathExtension:@"png"];
             saveImage(i, fn);
         }

@@ -130,6 +130,9 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 - (NSData *)PDFDataWithRect:(NSRect)rect
                       error:(NSError **)error;
 
+- (void)beginVectorDraw;
+- (void)endVectorDraw;
+
 // colors
 - (NSArray<NSColor *> *)visibleColors;
 - (void)setReplacementColors:(NSDictionary<NSColor *, NSColor *> *)colors;

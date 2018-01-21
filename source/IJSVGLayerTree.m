@@ -183,8 +183,11 @@
     CGPathRelease(introPath);
 
     // set the bounds
-    layer.frame = bounds;
-    
+    CGRect f = bounds;
+    f.origin.x += path.x.value;
+    f.origin.y += path.y.value;
+    layer.frame = f;
+
     // basic fill color and rule
     layer.fillColor = nil;
     layer.fillRule = [self fillRule:path.windingRule];

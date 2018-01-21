@@ -183,10 +183,9 @@
     CGPathRelease(introPath);
 
     // set the bounds
-    CGRect f = bounds;
-    f.origin.x += path.x.value;
-    f.origin.y += path.y.value;
-    layer.frame = f;
+    bounds.origin.x += path.x.value;
+    bounds.origin.y += path.y.value;
+    layer.frame = bounds;
 
     // basic fill color and rule
     layer.fillColor = nil;

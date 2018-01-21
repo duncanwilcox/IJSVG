@@ -7,12 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "IJSVG.h"
+
+typedef void (^IJSVGFontConverterEnumerateBlock)(NSString * unicode, IJSVG * svg);
 
 @interface IJSVGFontConverter : NSObject
 
 - (id)initWithFontAtFileURL:(NSURL *)url;
-- (NSDictionary *)paths;
-+ (NSBezierPath *)bezierpathFromCGPath:(CGPathRef)path;
 - (NSFont *)font;
+- (void)enumerateUsingBlock:(IJSVGFontConverterEnumerateBlock)block;
+
++ (IJSVG *)convertIJSVGPathToSVG:(IJSVGPath *)path;
++ (IJSVG *)convertPathToSVG:(CGPathRef)path;
 
 @end

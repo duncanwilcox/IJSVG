@@ -121,13 +121,6 @@ NSString * IJSVGHash(NSString * key) {
     return [@"#" stringByAppendingString:key];
 }
 
-- (void)dealloc
-{
-     _scaledRootNode = nil;
-     _svg = nil;
-     _dom = nil;
-}
-
 - (id)initWithSVG:(IJSVG *)svg
              size:(CGSize)size
           options:(IJSVGExporterOptions)options

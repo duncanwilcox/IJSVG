@@ -12,7 +12,7 @@
 @interface IJSVGFontConverter ()
 @property (nonatomic, strong) NSURL *url;
 @property (nonatomic, strong) NSFont *font;
-@property (nonatomic, strong) NSMutableDictionary *pathsInternal;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, id> *transformedPaths;
 @end
 
 @implementation IJSVGFontConverter
@@ -41,20 +41,16 @@
 {
     NSCharacterSet * charSet = self.font.coveredCharacterSet;
     NSMutableArray * array = [[NSMutableArray alloc] init];
-    for( int plane = 0; plane <= 16; plane++ )
-    {
-        if( [charSet hasMemberInPlane:plane] )
-        {
+    NSStringEncoding encoding = NSUTF32LittleEndianStringEncoding;
+    for( int plane = 0; plane <= 16; plane++ ) {
+        if( [charSet hasMemberInPlane:plane] ) {
             UTF32Char c;
-            for( c = plane << 16; c < (plane+1) << 16; c++ )
-            {
-                if( [charSet longCharacterIsMember:c] )
-                {
+            for( c = plane << 16; c < (plane+1) << 16; c++ ) {
+                if( [charSet longCharacterIsMember:c] ) {
                     UTF32Char c1 = NSSwapHostIntToLittle(c);
-                    // add it...
                     [array addObject:[[NSString alloc] initWithBytes:&c1
                                                                length:4
-                                                             encoding:NSUTF32LittleEndianStringEncoding]];
+                                                             encoding:encoding]];
                 }
             }
         }
@@ -64,14 +60,8 @@
 
 - (void)generateMap
 {
-    // we have already been made!
-    if( self.pathsInternal.count != 0 )
-        return;
-    
-    self.pathsInternal = [[NSMutableDictionary alloc] init];
     CTFontRef font = (__bridge CTFontRef)self.font;
-    for( NSString * charString in [self allCharacters] )
-    {
+    for( NSString * charString in [self allCharacters] ) {
         // get the characters in each char
         NSUInteger count = charString.length;
         unichar characters[count];
@@ -82,93 +72,52 @@
         CGGlyph glyphs[count];
         CTFontGetGlyphsForCharacters( font, characters, glyphs, count);
         CGPathRef path = CTFontCreatePathForGlyph( font, glyphs[0], NULL );
-        if( path != NULL )
-        {
-            NSString * k = [NSString stringWithFormat:@"%04x",[charString characterAtIndex:0]];
-            [self parseCGPath:path
-           forCharacterString:k];
+        if(path != NULL) {
+            // add SVG to the dictionary
+            NSString * key = [NSString stringWithFormat:@"%04x",[charString characterAtIndex:0]];
+            CGPathRef flippedPath = [IJSVGUtils newFlippedCGPath:path];
+            self.transformedPaths[key] = (__bridge id)flippedPath;
+            CGPathRelease(flippedPath);
         }
         CGPathRelease(path);
     }
 }
 
-- (void)parseCGPath:(CGPathRef)path
- forCharacterString:(NSString *)string
+- (void)enumerateUsingBlock:(IJSVGFontConverterEnumerateBlock)block
 {
-    [self.pathsInternal setObject:[[self class] bezierpathFromCGPath:path]
-               forKey:string];
-}
-
-- (NSDictionary *)paths
-{
-    [self generateMap];
-    return self.pathsInternal;
-}
-
-static void IJSVGCGPathCallback(void * info, const CGPathElement * element)
-{
-    NSBezierPath * path = (__bridge NSBezierPath *)info;
-    CGPoint * points = element->points;
-    switch( element->type )
-    {
-        // move to
-        case kCGPathElementMoveToPoint:
-        {
-            [path moveToPoint:NSMakePoint( points[0].x, points[0].y)];
-            break;
-        }
-            
-        // line to
-        case kCGPathElementAddLineToPoint:
-        {
-            [path lineToPoint:NSMakePoint( points[0].x, points[0].y)];;
-            break;
-        }
-            
-        // quad curve
-        case kCGPathElementAddQuadCurveToPoint:
-        {
-            [path addQuadCurveToPoint:points[1] controlPoint:points[0]];
-            break;
-        }
-            
-        // curve to
-        case kCGPathElementAddCurveToPoint:
-        {
-            [path curveToPoint:NSMakePoint(points[2].x, points[2].y)
-                 controlPoint1:NSMakePoint( points[0].x, points[0].y)
-                 controlPoint2:NSMakePoint( points[1].x, points[1].y)];
-            break;
-        }
-            
-        // close
-        case kCGPathElementCloseSubpath: {
-            [path closePath];
-            break;
-        }
+    if(_transformedPaths == nil) {
+        _transformedPaths = [[NSMutableDictionary alloc] init];
+        [self generateMap];
+    }
+    
+    for(NSString * key in _transformedPaths.allKeys) {
+        block(key, [self.class convertPathToSVG:(CGPathRef)_transformedPaths[key]]);
     }
 }
 
-+ (NSBezierPath *)bezierpathFromCGPath:(CGPathRef)path
++ (IJSVG *)convertIJSVGPathToSVG:(IJSVGPath *)path
 {
-    NSBezierPath * bezPath = [NSBezierPath bezierPath];
-    
-    // pass the path
-    CGPathApply( path, (__bridge void * _Nullable)(bezPath), IJSVGCGPathCallback );
-    
-    // the glyph will be upside down, so we need to turn it up the right way!
-    NSAffineTransform * trans = [NSAffineTransform transform];
-    
-    // scale -1 on the Y axis so its now correct but to far up
-    [trans scaleXBy:1.f
-                yBy:-1.f];
-    
-    // move it back down by its height
-    [trans translateXBy:0.f
-                    yBy:bezPath.controlPointBounds.size.height];
-    
-    [bezPath transformUsingAffineTransform:trans];
-    return bezPath;
+    CGPathRef cgPath = [IJSVGUtils newCGPathFromBezierPath:path.path];
+    CGPathRef flippedPath = [IJSVGUtils newFlippedCGPath:cgPath];
+    IJSVG * svg = [self convertPathToSVG:flippedPath];
+    CGPathRelease(flippedPath);
+    CGPathRelease(cgPath);
+    return svg;
+}
+
++ (IJSVG *)convertPathToSVG:(CGPathRef)path
+{
+    __block IJSVG * svg = nil;
+    IJSVGObtainTransactionLock(^{
+        IJSVGGroupLayer * layer = [[IJSVGGroupLayer alloc] init];
+        IJSVGShapeLayer * shape = [[IJSVGShapeLayer alloc] init];
+        [layer addSublayer:shape];
+        shape.path = path;
+        CGRect box = CGPathGetPathBoundingBox(path);
+        svg = [[IJSVG alloc] initWithSVGLayer:layer
+                                      viewBox:box];
+    }, NO);
+    return svg;
 }
 
 @end

@@ -12,6 +12,7 @@
 #import "IJSVGLayerTree.h"
 #import "IJSVGGroupLayer.h"
 #import "IJSVGImageLayer.h"
+#import "IJSVGExporter.h"
 
 @class IJSVG;
 
@@ -54,11 +55,12 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 - (void)prepForDrawingInView:(NSView *)view;
 - (BOOL)isFont;
 - (NSRect)viewBox;
-- (NSArray *)glyphs;
+- (NSArray<IJSVGPath *> *)glyphs;
 - (NSString *)identifier;
 - (IJSVGLayer *)layer;
 - (IJSVGLayer *)layerWithTree:(IJSVGLayerTree *)tree;
 - (NSArray<IJSVG *> *)subSVGs:(BOOL)recursive;
+- (NSString *)SVGStringWithOptions:(IJSVGExporterOptions)options;
 
 - (CGFloat)computeBackingScale:(CGFloat)scale;
 - (void)discardDOM;

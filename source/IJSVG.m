@@ -358,6 +358,14 @@
     return [self.group subSVGs:recursive];
 }
 
+- (NSString *)SVGStringWithOptions:(IJSVGExporterOptions)options
+{
+    IJSVGExporter * exporter = [[IJSVGExporter alloc] initWithSVG:self
+                                                              size:self.viewBox.size
+                                                           options:options];
+    return [exporter SVGString];
+}
+
 - (NSImage *)imageWithSize:(NSSize)aSize
 {
     return [self imageWithSize:aSize
@@ -503,7 +511,7 @@
     [self layer];
     
     // set the scale
-    __weak NSView * weakView = view;
+    __block NSView * weakView = view;
     self.renderingBackingScaleHelper = ^CGFloat{
         return weakView.window.screen.backingScaleFactor;
     };
@@ -577,7 +585,7 @@
            context:(CGContextRef)context
 {
     [self _drawInRect:rect
-              context:context 
+              context:context
                 error:nil];
 }
 
@@ -591,7 +599,7 @@
         @try {
             
             [self _beginDraw:rect];
-                
+            
             // scale the whole drawing context, but first, we need
             // to translate the context so its centered
             CGFloat tX = round(rect.size.width/2-(self.viewBox.size.width/2)*self.scale);
@@ -709,10 +717,8 @@
 - (IJSVGLayer *)layerWithTree:(IJSVGLayerTree *)tree
 {
     // clear memory
-    if(self.layerTree != nil) {
-         self.layerTree = nil;
-    }
-    
+     self.layerTree = nil;
+
     // force rebuild of the tree
     IJSVGBeginTransactionLock();
     self.layerTree = [tree layerForNode:self.group];

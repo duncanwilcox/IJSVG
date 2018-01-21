@@ -525,7 +525,9 @@
                                                           kind:element.kind];
             
             switch(childType) {
-                case IJSVGNodeTypeStyle: {
+                case IJSVGNodeTypeStyle:
+                case IJSVGNodeTypeGlyph:
+                case IJSVGNodeTypeFont: {
                     [self _parseBaseBlock:childDef
                                 intoGroup:self
                                       def:NO];

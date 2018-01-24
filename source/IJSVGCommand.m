@@ -29,7 +29,7 @@ static NSMutableDictionary * _classes = nil;
         // work out the basics
         self.currentIndex = 0;
         self.subCommands = [[NSMutableArray alloc] init];
-        self.command = [[str substringToIndex:1] copy];
+        self.command = [str substringToIndex:1];
         self.type = [IJSVGUtils typeForCommandString:self.command];
         self.commandClass = [[self class] commandClassForCommandLetter:self.command];
         NSInteger cnt = 0;
@@ -63,8 +63,9 @@ static NSMutableDictionary * _classes = nil;
             c.parameters = subParams;
             c.type = self.type;
             c.command = self.command;
-            c.previousCommand = [self.subCommands lastObject];
+            c.previousCommand = self.subCommands.lastObject;
             c.commandClass = self.commandClass;
+            c.isSubCommand = i == 0 ? NO : YES;
             
             // add it to our tree
             [self.subCommands addObject:c];

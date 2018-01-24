@@ -41,6 +41,7 @@ typedef NS_ENUM( NSInteger, IJSVGCommandType ) {
 @property (nonatomic, strong) NSMutableArray * subCommands;
 @property (nonatomic, assign) Class<IJSVGCommandProtocol> commandClass;
 @property (nonatomic, weak) IJSVGCommand * previousCommand;
+@property ( nonatomic, assign ) BOOL isSubCommand;
 
 - (id)initWithCommandString:(NSString *)commandString;
 

@@ -24,8 +24,7 @@
 
 - (id)initWithCGImage:(id)imageRef
 {
-    if((self = [super init]) != nil)
-    {
+    if((self = [super init]) != nil) {
         // set the contents
         self.contents = imageRef;
         
@@ -40,6 +39,16 @@
         };
     }
     return self;
+}
+
+- (void)setNeedsDisplay
+{
+    // swap the content around on call
+    // because set needs display discards previous
+    // content - yolo!
+    id oldContent = self.contents;
+    [super setNeedsDisplay];
+    self.contents = oldContent;
 }
 
 @end

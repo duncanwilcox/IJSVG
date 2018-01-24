@@ -433,11 +433,12 @@ CGFloat degrees_to_radians( CGFloat degrees )
         if (didClosePath == NO) {
             CGPathCloseSubpath(path);
         }
-        
+     
         // memory clean
         immutablePath = CGPathCreateCopy(path);
         CGPathRelease(path);
     }
     return immutablePath;
 }
+
 @end

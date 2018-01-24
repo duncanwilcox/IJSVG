@@ -28,8 +28,7 @@
 
 - (id)init
 {
-    if((self = [super init]) != nil)
-    {
+    if((self = [super init]) != nil) {
         self.lineJoinStyle = IJSVGLineJoinStyleNone;
         self.lineCapStyle = IJSVGLineCapStyleNone;
     }
@@ -128,7 +127,7 @@
 - (IJSVGLayer *)layerForImage:(IJSVGImage *)image
 {
     IJSVGImageLayer * layer = [[IJSVGImageLayer alloc] initWithCGImage:image.CGImage];
-    layer.frame = CGRectMake(image.x.value, image.y.value, image.width.value, image.height.value);
+    layer.frame = CGRectMake(0.f, 0.f, image.width.value, image.height.value);
     layer.affineTransform = CGAffineTransformConcat(layer.affineTransform,
                                                     CGAffineTransformMakeScale( 1.f, -1.f));
     return layer;

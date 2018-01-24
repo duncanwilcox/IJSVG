@@ -30,6 +30,11 @@
     [self.classesInternal addObject:className];
 }
 
+- (NSArray *)classes
+{
+    return self.classesInternal;
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"Combinator: %@, Tag: %@, Classes: %@, Identifier: %@", self.combinatorString, self.tag, self.classesInternal, self.identifier];

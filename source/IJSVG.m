@@ -617,7 +617,6 @@
                                                          code:IJSVGErrorDrawing
                                                      userInfo:nil];
                 }
-                CGContextRestoreGState(ref);
                 return NO;
             }
             

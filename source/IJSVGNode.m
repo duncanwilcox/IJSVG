@@ -71,6 +71,8 @@
     if([string isEqualToString:@"tspan"] || kind == NSXMLTextKind) {
         return IJSVGNodeTypeTextSpan;
     }
+    if([string isEqualToString:@"a"])
+        return IJSVGNodeTypeA;
     return IJSVGNodeTypeNotFound;
 }
 

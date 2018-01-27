@@ -664,7 +664,8 @@
         case IJSVGNodeTypeSwitch:
         case IJSVGNodeTypeFont:
         case IJSVGNodeTypeMask:
-        case IJSVGNodeTypeGroup: {
+        case IJSVGNodeTypeGroup:
+        case IJSVGNodeTypeA: {
             
             // parse the defs
             [self parseDefsForElement:element];
@@ -678,7 +679,8 @@
             // only groups get added to parent, rest is added as a def -
             // also addition of switches
             if(!flag && ((aType == IJSVGNodeTypeGroup) ||
-                         (aType == IJSVGNodeTypeSwitch))) {
+                         (aType == IJSVGNodeTypeSwitch) ||
+                         (aType == IJSVGNodeTypeA))) {
                 [parentGroup addChild:group];
             }
             

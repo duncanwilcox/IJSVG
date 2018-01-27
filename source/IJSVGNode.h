@@ -41,6 +41,7 @@ typedef NS_ENUM( NSInteger, IJSVGNodeType ) {
     IJSVGNodeTypeTextSpan,
     IJSVGNodeTypeStyle,
     IJSVGNodeTypeSwitch,
+    IJSVGNodeTypeA,
     IJSVGNodeTypeNotFound,
 };
 

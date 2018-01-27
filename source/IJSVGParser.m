@@ -9,6 +9,24 @@
 #import "IJSVGParser.h"
 #import "IJSVG.h"
 
+@interface NSXMLElement (IJSVG_XMLNamespace)
+- (NSString *)svgName;
+@end
+
+@implementation NSXMLElement (IJSVG_XMLNamespace)
+- (NSString *)svgName
+{
+    NSString *name = self.name;
+    NSRange r = [name rangeOfString:@":"];
+    if(r.location == NSNotFound)
+        return name;
+    NSString *ns = [name substringWithRange:NSMakeRange(0, r.location + 1)];
+    if([[self resolveNamespaceForName:ns].stringValue isEqualToString:@"http://www.w3.org/2000/svg"])
+        name = [name substringWithRange:NSMakeRange(r.location + 1, name.length - (r.location + 1))];
+    return name;
+}
+@end
+
 @interface IJSVGParser ()
 @property (nonatomic, weak) id<IJSVGParserDelegate> delegate;
 @property (nonatomic, strong) NSXMLDocument *document;
@@ -219,7 +237,7 @@
     
     // the root element is SVG, so iterate over its children
     // recursively
-    self.name = svgElement.name;
+    self.name = svgElement.svgName;
     [self _parseBlock:svgElement
             intoGroup:self
                   def:NO];
@@ -521,7 +539,7 @@
     
     for(NSXMLElement * element in anElement.children) {
         // not a def
-        if([IJSVGNode typeForString:element.name
+        if([IJSVGNode typeForString:element.svgName
                                kind:element.kind] != IJSVGNodeTypeDef) {
             continue;
         }
@@ -562,7 +580,7 @@
               intoGroup:(IJSVGGroup *)parentGroup
                     def:(BOOL)flag
 {
-    NSString * subName = element.name;
+    NSString * subName = element.svgName;
     NSXMLNodeKind nodeKind = element.kind;
     IJSVGNodeType aType = [IJSVGNode typeForString:subName
                                               kind:nodeKind];

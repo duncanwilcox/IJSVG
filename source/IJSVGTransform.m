@@ -27,6 +27,19 @@
     return trans;
 }
 
++ (IJSVGTransform *)transformByTranslatingX:(CGFloat)x
+                                          y:(CGFloat)y
+{
+    IJSVGTransform * transform = [[self alloc] init];
+    transform.command = IJSVGTransformCommandTranslate;
+    transform.parameterCount = 2;
+    CGFloat * params = (CGFloat *)malloc(sizeof(CGFloat)*2);
+    params[0] = x;
+    params[1] = y;
+    transform.parameters = params;
+    return transform;
+}
+
 - (void)recalculateWithBounds:(CGRect)bounds
 {
     CGFloat max = bounds.size.width>bounds.size.height?bounds.size.width:bounds.size.height;
@@ -95,8 +108,9 @@
         {
             NSString * command = [string substringWithRange:[result rangeAtIndex:1]];
             IJSVGTransformCommand commandType = [[self class] commandForCommandString:command];
-            if( commandType == IJSVGTransformCommandNotImplemented )
+            if( commandType == IJSVGTransformCommandNotImplemented ) {
                 return;
+            }
             
             // create the transform
             NSString * params = [string substringWithRange:[result rangeAtIndex:2]];
@@ -392,6 +406,12 @@
         }
     }
     return CGAffineTransformIdentity;
+}
+
++ (NSArray<IJSVGTransform *> *)transformsFromAffineTransform:(CGAffineTransform)affineTransform
+{
+    NSArray * strings = [self affineTransformToSVGTransformAttributeString:affineTransform];
+    return [self transformsForString:[strings componentsJoinedByString:@" "]];
 }
 
 // this is an Object-C version of the matrixToTransform method from SVGO

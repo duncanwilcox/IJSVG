@@ -33,6 +33,8 @@
                    withBlock:(void (^)(CALayer * layer, BOOL isMask))block;
 + (CGRect)absoluteFrameOfLayer:(IJSVGLayer *)layer;
 
++ (CGAffineTransform)transformAbsolute:(IJSVGLayer *)layer;
+
 - (void)applySublayerMaskToContext:(CGContextRef)context
                        forSublayer:(IJSVGLayer *)sublayer
                         withOffset:(CGPoint)offset;

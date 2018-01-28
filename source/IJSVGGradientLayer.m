@@ -21,18 +21,24 @@
 - (void)drawInContext:(CGContextRef)ctx
 {
     [super drawInContext:ctx];
- 
+    
     // nothing to do :(
     if(self.gradient == nil) {
         return;
     }
     
     // draw the gradient
-    NSRect absRect = [IJSVGLayer absoluteFrameOfLayer:self];
+    NSRect rect = [IJSVGLayer absoluteFrameOfLayer:self];
+    CGAffineTransform absoluteTransform = [IJSVGLayer transformAbsolute:(IJSVGLayer *)self.superlayer];
+    NSRect frame = self.superlayer.frame;
+    frame.origin = rect.origin;
+    
+    CGAffineTransform trans = CGAffineTransformMakeTranslation(-CGRectGetMinX(frame),
+                                                               -CGRectGetMinY(frame));
+    absoluteTransform = CGAffineTransformConcat(absoluteTransform, trans);
     [self.gradient drawInContextRef:ctx
-                         parentRect:self.frame
-                        drawingRect:self.bounds
-                   absolutePosition:absRect.origin
+                         objectRect:frame
+                  absoluteTransform:absoluteTransform
                            viewPort:self.viewBox];
 }
 

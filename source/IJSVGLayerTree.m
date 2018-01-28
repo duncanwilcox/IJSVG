@@ -436,10 +436,7 @@
     // the gradient drawing layer
     IJSVGGradientLayer * gradLayer = [[IJSVGGradientLayer alloc] init];
     gradLayer.viewBox = self.viewBox;
-    gradLayer.frame = (CGRect) {
-        .origin = CGPointZero,
-        .size = CGPathGetBoundingBox(((IJSVGShapeLayer *)layer).path).size
-    };
+    gradLayer.frame = layer.bounds;
     gradLayer.gradient = gradient;
     gradLayer.mask = mask;
     
@@ -447,9 +444,6 @@
     if(path.fillOpacity.value != 0.f) {
         gradLayer.opacity = path.fillOpacity.value;
     }
-    
-    // display it
-    [gradLayer setNeedsDisplay];
     return gradLayer;
 }
 
@@ -738,6 +732,31 @@
     for(IJSVGLayer * sublayer in layer.sublayers) {
         [self log:(IJSVGLayer *)sublayer
             depth:depth++];
+    }
+}
+
++ (void)debug:(IJSVGLayer *)rootLayer
+{
+    NSMutableArray * toAdd = [[NSMutableArray alloc] init];
+    [IJSVGLayer recursivelyWalkLayer:rootLayer
+                           withBlock:^(CALayer *layer, BOOL isMask)
+     {
+         layer.borderColor = NSColor.greenColor.CGColor;
+         layer.borderWidth = 3.f;
+         
+         // add some text
+         NSRect abs = [IJSVGLayer absoluteFrameOfLayer:(IJSVGLayer *)layer];
+         IJSVGShapeLayer * shapeLayer = [[IJSVGShapeLayer alloc] init];
+         NSBezierPath * path = [NSBezierPath bezierPathWithRect:NSMakeRect(abs.origin.x, abs.origin.y,
+                                                                           10.f, 10.f)];
+         CGPathRef nPath = [IJSVGUtils newCGPathFromBezierPath:path];
+         shapeLayer.path = nPath;
+         CGPathRelease(nPath);
+         [toAdd addObject:shapeLayer];
+     }];
+    
+    for(IJSVGShapeLayer * l in toAdd) {
+        [rootLayer addSublayer:l];
     }
 }
 

@@ -21,8 +21,6 @@
 {
     IJSVGGradient * clone = [super copyWithZone:zone];
     clone.gradient = [self.gradient copy];
-    clone.startPoint = self.startPoint;
-    clone.endPoint = self.endPoint;
     return clone;
 }
 
@@ -30,14 +28,11 @@
                                   colors:(NSArray **)someColors
 {
     // find each stop element
-    NSArray * stops = [element nodesForXPath:@"stop"
-                                       error:nil];
-    
+    NSArray * stops = [element children];
     NSMutableArray * colors = [[NSMutableArray alloc] initWithCapacity:stops.count];
     CGFloat * stopsParams = (CGFloat *)malloc(stops.count*sizeof(CGFloat));
     NSInteger i = 0;
-    for( NSXMLElement * stop in stops )
-    {
+    for( NSXMLElement * stop in stops ) {
         // find the offset
         CGFloat offset = [stop attributeForName:@"offset"].stringValue.floatValue;
         if( offset > 1.f ) {
@@ -105,7 +100,7 @@
     if(_CGGradient != nil) {
         return _CGGradient;
     }
-
+    
     // actually create the gradient
     NSInteger num = self.gradient.numberOfColorStops;
     CGFloat * locations = malloc(sizeof(CGFloat)*num);
@@ -124,7 +119,10 @@
 }
 
 - (void)drawInContextRef:(CGContextRef)ctx
-                    rect:(NSRect)rect
+              parentRect:(NSRect)parentRect
+             drawingRect:(NSRect)rect
+        absolutePosition:(CGPoint)absolutePosition
+                viewPort:(CGRect)viewBox
 {
 }
 

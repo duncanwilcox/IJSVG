@@ -31,6 +31,7 @@
 + (NSArray *)deepestSublayersOfLayer:(CALayer *)layer;
 + (void)recursivelyWalkLayer:(CALayer *)layer
                    withBlock:(void (^)(CALayer * layer, BOOL isMask))block;
++ (CGRect)absoluteFrameOfLayer:(IJSVGLayer *)layer;
 
 - (void)applySublayerMaskToContext:(CGContextRef)context
                        forSublayer:(IJSVGLayer *)sublayer

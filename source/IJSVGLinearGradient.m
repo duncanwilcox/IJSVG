@@ -13,8 +13,6 @@
 
 + (NSGradient *)parseGradient:(NSXMLElement *)element
                      gradient:(IJSVGLinearGradient *)aGradient
-                   startPoint:(CGPoint *)startPoint
-                     endPoint:(CGPoint *)endPoint
 {
     
     CGFloat px1 = [[element attributeForName:@"x1"] stringValue].floatValue;
@@ -58,36 +56,64 @@
                                                 colorSpace:[NSColorSpace genericRGBColorSpace]];
     
     free(stopsParams);
-    return grad;
+    return grad ;
 }
 
 - (void)drawInContextRef:(CGContextRef)ctx
-                    rect:(NSRect)rect
+              parentRect:(NSRect)parentRect
+             drawingRect:(NSRect)rect
+        absolutePosition:(CGPoint)absolutePosition
+                viewPort:(CGRect)viewBox
 {
-    // grab the start and end point
-    CGPoint aStartPoint = (CGPoint){
-        .x = [self.x1 computeValue:rect.size.width],
-        .y = [self.y1 computeValue:rect.size.height]
+    BOOL inUserSpace = self.units == IJSVGUnitUserSpaceOnUse;
+    
+    CGPoint gradientStartPoint = CGPointZero;
+    CGPoint gradientEndPoint = CGPointZero;
+    CGAffineTransform absTransform = IJSVGAbsoluteTransform(absolutePosition);
+    CGAffineTransform selfTransform = IJSVGConcatTransforms(self.transforms);
+    
+#pragma mark User Space On Use
+    CGContextSaveGState(ctx);
+    {
+        if(inUserSpace == YES) {
+            gradientStartPoint = CGPointMake([self.x1 computeValue:CGRectGetWidth(viewBox)],
+                                             [self.y1 computeValue:CGRectGetHeight(viewBox)]);
+            gradientEndPoint = CGPointMake([self.x2 computeValue:CGRectGetWidth(viewBox)],
+                                           [self.y2 computeValue:CGRectGetHeight(viewBox)]);
+            
+            
+            // transform absolute - due to user space
+            CGContextConcatCTM(ctx, absTransform);
+        } else {
+#pragma mark Object Bounding Box
+            gradientStartPoint = CGPointMake([self.x1 computeValue:CGRectGetWidth(parentRect)],
+                                             [self.y1 computeValue:CGRectGetHeight(parentRect)]);
+            gradientEndPoint = CGPointMake([self.x2 computeValue:CGRectGetWidth(parentRect)],
+                                           [self.y2 computeValue:CGRectGetHeight(parentRect)]);
+        }
+        
+        // check rotation
+        CGFloat rotation = atan2(absTransform.b, absTransform.d);
+        if(fabs(rotation) > .01) {
+            CGAffineTransform tr = CGAffineTransformMakeTranslation(.5f, .5f);
+            tr = CGAffineTransformRotate(tr, rotation);
+            tr = CGAffineTransformTranslate(tr, -.5f, -.5f);
+            gradientStartPoint = CGPointApplyAffineTransform(gradientStartPoint, tr);
+            gradientEndPoint = CGPointApplyAffineTransform(gradientEndPoint, tr);
+        }
+        
+    
+        // transform the context
+        CGContextConcatCTM(ctx, selfTransform);
+        
+        // draw the gradient
+        CGGradientDrawingOptions options = kCGGradientDrawsBeforeStartLocation|
+            kCGGradientDrawsAfterEndLocation;
+        
+        CGContextDrawLinearGradient(ctx, self.CGGradient, gradientStartPoint,
+                                    gradientEndPoint, options);
     };
-    
-    CGPoint aEndPoint = (CGPoint){
-        .x = [self.x2 computeValue:rect.size.width],
-        .y = [self.y2 computeValue:rect.size.height]
-    };
-    
-    // convert the nsgradient to a CGGradient
-    CGGradientRef gRef = [self CGGradient];
-    
-    // apply transform for each point
-    for( IJSVGTransform * transform in self.transforms ) {
-        CGAffineTransform trans = transform.CGAffineTransform;
-        aStartPoint = CGPointApplyAffineTransform(aStartPoint, trans);
-        aEndPoint = CGPointApplyAffineTransform(aEndPoint, trans);
-    }
-    
-    // draw the gradient
-    CGGradientDrawingOptions opt = kCGGradientDrawsBeforeStartLocation|kCGGradientDrawsAfterEndLocation;
-    CGContextDrawLinearGradient(ctx, gRef, aStartPoint, aEndPoint, opt);
+    CGContextRestoreGState(ctx);
 }
 
 @end

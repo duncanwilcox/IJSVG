@@ -128,6 +128,14 @@
     IJSVGImageLayer * layer = [[IJSVGImageLayer alloc] initWithCGImage:image.CGImage];
     layer.affineTransform = CGAffineTransformConcat(layer.affineTransform,
                                                     CGAffineTransformMakeScale( 1.f, -1.f));
+    
+    // make sure we set the width and height correctly,
+    // as this may not be exactly the same as the size of the
+    // given image
+    CGRect frame = layer.frame;
+    frame.size.width = image.width.value;
+    frame.size.height = image.height.value;
+    layer.frame = frame;
     return layer;
 }
 
@@ -229,11 +237,6 @@
         
         // add the gradient and set it against the layer
         [layer addSublayer:gradLayer];
-        
-        // apply offsets
-        [self applyOffsetsToLayer:gradLayer
-                         fromNode:path.fillGradient];
-        
         layer.gradientFillLayer = gradLayer;
         
     } else if(self.fillColor == nil && path.fillPattern != nil) {
@@ -432,7 +435,11 @@
     
     // the gradient drawing layer
     IJSVGGradientLayer * gradLayer = [[IJSVGGradientLayer alloc] init];
-    gradLayer.frame = CGPathGetBoundingBox(((IJSVGShapeLayer *)layer).path);
+    gradLayer.viewBox = self.viewBox;
+    gradLayer.frame = (CGRect) {
+        .origin = CGPointZero,
+        .size = CGPathGetBoundingBox(((IJSVGShapeLayer *)layer).path).size
+    };
     gradLayer.gradient = gradient;
     gradLayer.mask = mask;
     
@@ -443,16 +450,6 @@
     
     // display it
     [gradLayer setNeedsDisplay];
-    
-    if(path.fillGradient.units == IJSVGUnitUserSpaceOnUse) {
-        // move back if needed
-        gradLayer.frame = (CGRect){
-            .size = gradLayer.frame.size,
-            .origin = CGPointMake(-fabs(gradLayer.frame.origin.x),
-                                  -fabs(gradLayer.frame.origin.y))
-        };
-    }
-    
     return gradLayer;
 }
 

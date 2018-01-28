@@ -34,8 +34,8 @@
         // set the frame, simple stuff
         self.frame = (CGRect){
             .origin = CGPointZero,
-            .size = CGSizeMake( CGImageGetWidth((CGImageRef)imageRef),
-                                CGImageGetHeight((CGImageRef)imageRef))
+            .size = CGSizeMake(CGImageGetWidth((CGImageRef)imageRef),
+                               CGImageGetHeight((CGImageRef)imageRef))
         };
     }
     return self;

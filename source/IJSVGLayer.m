@@ -24,6 +24,10 @@
     IJSVGEndTransactionLock();
 }
 
+CGAffineTransform IJSVGAbsoluteTransform(CGPoint absolutePoint) {
+    return CGAffineTransformMakeTranslation(-absolutePoint.x,
+                                            -absolutePoint.y);
+};
 
 + (NSArray *)deepestSublayersOfLayer:(CALayer *)layer
 {
@@ -180,6 +184,21 @@
         pLayer = pLayer.superlayer;
     }
     return point;
+}
+
++ (CGRect)absoluteFrameOfLayer:(IJSVGLayer *)layer
+{
+    CGPoint point = layer.frame.origin;
+    CGSize size = layer.frame.size;
+    while(layer.superlayer != nil) {
+        point = [layer convertPoint:point
+                            toLayer:layer.superlayer];
+        layer = (IJSVGLayer *)layer.superlayer;
+    }
+    return (CGRect){
+        .origin = point,
+        .size = size
+    };
 }
 
 @end

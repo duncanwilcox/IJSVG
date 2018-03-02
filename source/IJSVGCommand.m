@@ -29,7 +29,7 @@ static NSMutableDictionary * _classes = nil;
         // work out the basics
         self.currentIndex = 0;
         self.subCommands = [[NSMutableArray alloc] init];
-        self.command = [str substringToIndex:1];
+        self.command = [[str substringToIndex:1] copy];
         self.type = [IJSVGUtils typeForCommandString:self.command];
         self.commandClass = [[self class] commandClassForCommandLetter:self.command];
         NSInteger cnt = 0;

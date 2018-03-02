@@ -9,27 +9,6 @@
 #import "IJSVGParser.h"
 #import "IJSVG.h"
 
-@interface NSXMLNode (IJSVG_XMLNamespace)
-- (NSString *)svgName;
-@end
-
-@implementation NSXMLNode (IJSVG_XMLNamespace)
-- (NSString *)svgName
-{
-    NSString *name = self.name;
-    NSRange r = [name rangeOfString:@":"];
-    if(r.location == NSNotFound)
-        return name;
-    if([self isKindOfClass:[NSXMLElement class]])
-    {
-        NSString *ns = [name substringWithRange:NSMakeRange(0, r.location + 1)];
-        if([[(NSXMLElement *)self resolveNamespaceForName:ns].stringValue isEqualToString:@"http://www.w3.org/2000/svg"])
-            name = [name substringWithRange:NSMakeRange(r.location + 1, name.length - (r.location + 1))];
-    }
-    return name;
-}
-@end
-
 @interface IJSVGParser ()
 @property (nonatomic, weak) id<IJSVGParserDelegate> delegate;
 @property (nonatomic, strong) NSXMLDocument *document;
@@ -48,6 +27,9 @@
 @end
 
 @implementation IJSVGParser
+
+@synthesize viewBox;
+@synthesize proposedViewSize;
 
 + (IJSVGParser *)groupForFileURL:(NSURL *)aURL
 {
@@ -106,8 +88,10 @@
         
         // error parsing the XML document
         if( anError != nil ) {
-            return [self _handleErrorWithCode:IJSVGErrorParsingFile
+            [self _handleErrorWithCode:IJSVGErrorParsingFile
                                         error:error];
+            self = nil;
+            return nil;
         }
         
         // attempt to parse the file
@@ -116,8 +100,10 @@
             [self _parse];
         }
         @catch (NSException *exception) {
-            return [self _handleErrorWithCode:IJSVGErrorParsingSVG
+            [self _handleErrorWithCode:IJSVGErrorParsingSVG
                                         error:error];
+            self = nil;
+            return nil;
         }
         
         
@@ -125,15 +111,15 @@
         anError = nil;
         if( ![self _validateParse:&anError] ) {
             *error = anError;
-             self.document = nil;
-             self = nil;
+            self.document = nil;
+            self = nil;
             return nil;
         }
         
         // we have actually finished with the document at this point
         // so just get rid of it
-         self.document = nil;
-        
+        self.document = nil;
+
     }
     return self;
     
@@ -151,8 +137,10 @@
     
     // error reading file
     if(str == nil) {
-        return [self _handleErrorWithCode:IJSVGErrorReadingFile
+        [self _handleErrorWithCode:IJSVGErrorReadingFile
                                     error:error];
+        self = nil;
+        return nil;
     }
     
     return [self initWithSVGString:str
@@ -160,16 +148,15 @@
                           delegate:delegate];
 }
 
-- (void *)_handleErrorWithCode:(NSUInteger)code
+- (BOOL)_handleErrorWithCode:(NSUInteger)code
                          error:(NSError **)error
 {
     if( error )
         *error = [[NSError alloc] initWithDomain:IJSVGErrorDomain
                                              code:code
                                          userInfo:nil];
-     self.document = nil;
-    //[self release]; self = nil;
-    return nil;
+    self.document = nil;
+    return YES;
 }
 
 - (BOOL)_validateParse:(NSError **)error
@@ -238,10 +225,10 @@
         h = self.viewBox.size.height;
     }
     self.proposedViewSize = NSMakeSize( w, h );
-    
+
     // the root element is SVG, so iterate over its children
     // recursively
-    self.name = svgElement.svgName;
+    self.name = svgElement.name;
     [self _parseBlock:svgElement
             intoGroup:self
                   def:NO];
@@ -427,12 +414,15 @@
                 node.fillPattern = (IJSVGPattern *)obj;
             }
         } else {
-            // its a color
             node.fillColor = [IJSVGColor colorFromString:value];
-            if(node.fillOpacity.value != 1.f) {
-                node.fillColor = [IJSVGColor changeAlphaOnColor:node.fillColor
-                                                             to:node.fillOpacity.value];
-            }
+        }
+    });
+    
+    // fill opacity
+    attr(IJSVGAttributeFillOpacity, ^(NSString * value) {
+        if(node.fillOpacity.value != 1.f) {
+            node.fillColor = [IJSVGColor changeAlphaOnColor:node.fillColor
+                                                         to:node.fillOpacity.value];
         }
     });
     
@@ -555,7 +545,7 @@
     
     for(NSXMLElement * element in anElement.children) {
         // not a def
-        if([IJSVGNode typeForString:element.svgName
+        if([IJSVGNode typeForString:element.localName
                                kind:element.kind] != IJSVGNodeTypeDef) {
             continue;
         }
@@ -563,7 +553,7 @@
         // store each object
         for(NSXMLElement * childDef in element.children) {
             // is there any stylesheets within this?
-            IJSVGNodeType childType = [IJSVGNode typeForString:childDef.name
+            IJSVGNodeType childType = [IJSVGNode typeForString:childDef.localName
                                                           kind:element.kind];
             
             switch(childType) {
@@ -596,7 +586,7 @@
               intoGroup:(IJSVGGroup *)parentGroup
                     def:(BOOL)flag
 {
-    NSString * subName = element.svgName;
+    NSString * subName = element.localName;
     NSXMLNodeKind nodeKind = element.kind;
     IJSVGNodeType aType = [IJSVGNode typeForString:subName
                                               kind:nodeKind];
@@ -633,7 +623,7 @@
             [self _parseElementForCommonAttributes:element
                                               node:path
                                   ignoreAttributes:nil];
-            
+                        
             // work out the SVG
             NSError * error = nil;
             NSString * SVGString = element.XMLString;
@@ -698,8 +688,7 @@
         case IJSVGNodeTypeSwitch:
         case IJSVGNodeTypeFont:
         case IJSVGNodeTypeMask:
-        case IJSVGNodeTypeGroup:
-        case IJSVGNodeTypeA: {
+        case IJSVGNodeTypeGroup: {
             
             // parse the defs
             [self parseDefsForElement:element];
@@ -713,8 +702,7 @@
             // only groups get added to parent, rest is added as a def -
             // also addition of switches
             if(!flag && ((aType == IJSVGNodeTypeGroup) ||
-                         (aType == IJSVGNodeTypeSwitch) ||
-                         (aType == IJSVGNodeTypeA))) {
+                         (aType == IJSVGNodeTypeSwitch))) {
                 [parentGroup addChild:group];
             }
             
@@ -908,6 +896,7 @@
             subGroup.parentNode = parentGroup;
             [subGroup addChild:node];
             node.parentNode = subGroup;
+            node.intermediateParentNode = subGroup;
             
             // is there a width and height?
             CGFloat x = [element attributeForName:(NSString *)IJSVGAttributeX].stringValue.floatValue;
@@ -923,12 +912,11 @@
             // parse attributes from element onto group - but spec
             // says ignore x, y, width, height and xlink:href...
             [self _parseElementForCommonAttributes:element
-                                              node:subGroup
+                                              node:node
                                   ignoreAttributes:@[@"x",@"y",@"width",
                                                      @"height",@"xlink:href"]];
             
-            [subGroup addDef:node];
-            [parentGroup addDef:subGroup];
+            [parentGroup addDef:node];
             break;
         }
             
@@ -1055,7 +1043,7 @@
         }
             
         // image
-        case IJSVGNodeTypeImage: {
+        case IJSVGNodeTypeImage: {            
             IJSVGImage * image = [[IJSVGImage alloc] init];
             
             [self _setupDefaultsForNode:image];

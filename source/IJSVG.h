@@ -13,6 +13,7 @@
 #import "IJSVGGroupLayer.h"
 #import "IJSVGImageLayer.h"
 #import "IJSVGExporter.h"
+#import "IJSVGQuartzRenderer.h"
 
 @class IJSVG;
 
@@ -36,6 +37,11 @@ withSVGString:(NSString *)subSVGString;
 
 typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 
+typedef NS_ENUM(NSInteger, IJSVGRenderingEngine) {
+    IJSVGRenderingEngineCoreGraphics,
+    IJSVGRenderingEngineCoreAnimation
+};
+
 @interface IJSVG : NSObject <NSPasteboardWriting, IJSVGParserDelegate>
 
 // set this to be called when the layer is about to draw, it will call this
@@ -51,6 +57,8 @@ typedef CGFloat (^IJSVGRenderingBackingScaleFactorHelper)(void);
 @property (nonatomic, assign) CGFloat strokeWidth;
 @property (nonatomic, assign) IJSVGLineCapStyle lineCapStyle;
 @property (nonatomic, assign) IJSVGLineJoinStyle lineJoinStyle;
+@property (nonatomic, assign) IJSVGRenderingEngine renderingEngine;
+@property (nonatomic, assign) BOOL clipToViewport;
 
 - (void)prepForDrawingInView:(NSView *)view;
 - (BOOL)isFont;

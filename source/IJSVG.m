@@ -1,5 +1,5 @@
 //
-//  IJSVG.m
+//  IJSVGImage.m
 //  IconJar
 //
 //  Created by Curtis Hard on 30/08/2014.
@@ -9,6 +9,7 @@
 #import "IJSVG.h"
 #import "IJSVGCache.h"
 #import "IJSVGTransaction.h"
+#import "IJSVGExporter.h"
 
 @interface IJSVG ()
 @property (nonatomic, strong) IJSVGParser *group;
@@ -19,7 +20,9 @@
 @property (nonatomic, assign) CGRect viewBox;
 @property (nonatomic, assign) CGSize proposedViewSize;
 @property (nonatomic, assign) CGFloat lastProposedBackingScale;
+@property (nonatomic, assign) CGFloat backingScale;
 @property (nonatomic, strong) NSMutableDictionary *replacementColorsInternal;
+@property (nonatomic, strong) IJSVGQuartzRenderer * quartzRenderer;
 @property (nonatomic, assign) BOOL respondsTo_shouldHandleForeignObject;
 @property (nonatomic, assign) BOOL respondsTo_handleForeignObject;
 @property (nonatomic, assign) BOOL respondsTo_shouldHandleSubSVG;
@@ -248,7 +251,7 @@
             if( error != NULL ) {
                 *error = anError;
             }
-             self = nil;
+            self = nil;
             return nil;
         }
         
@@ -302,7 +305,7 @@
             if(error != NULL) {
                 *error = anError;
             }
-             self = nil;
+            self = nil;
             return nil;
         }
     }
@@ -328,7 +331,14 @@
 
 - (void)_setupBasicsFromAnyInitializer
 {
-    self.lastProposedBackingScale = 1.f;
+    self.renderingEngine = IJSVGRenderingEngineCoreAnimation;
+    self.clipToViewport = YES;
+    
+    // setup low level backing scale
+    self.lastProposedBackingScale = 0.f;
+    self.renderingBackingScaleHelper = ^CGFloat{
+        return 1.f;
+    };
 }
 
 - (NSString *)identifier
@@ -348,7 +358,7 @@
     return [self.group isFont];
 }
 
-- (NSArray *)glyphs
+- (NSArray<IJSVGPath *> *)glyphs
 {
     return [self.group glyphs];
 }
@@ -393,8 +403,6 @@
                    flipped:(BOOL)flipped
                      error:(NSError **)error
 {
-    assert(NSThread.isMainThread);
-
     NSImage * im = [[NSImage alloc] initWithSize:aSize];
     [im lockFocus];
     CGContextRef ref = [[NSGraphicsContext currentContext] graphicsPort];
@@ -549,6 +557,7 @@
 
 - (CGFloat)computeBackingScale:(CGFloat)actualScale
 {
+    self.backingScale = actualScale;
     return (CGFloat)(self.scale + actualScale);
 }
 
@@ -558,8 +567,8 @@
     // we also need to calculate the viewport so we can clip
     // the drawing if needed
     NSRect viewPort = NSZeroRect;
-    viewPort.origin.x = round(rect.size.width/2-(self.proposedViewSize.width/2)*self.clipScale);
-    viewPort.origin.y = round(rect.size.height/2-(self.proposedViewSize.height/2)*self.clipScale);
+    viewPort.origin.x = round((rect.size.width/2-(self.proposedViewSize.width/2)*self.clipScale) + rect.origin.x);
+    viewPort.origin.y = round((rect.size.height/2-(self.proposedViewSize.height/2)*self.clipScale) + rect.origin.y);
     viewPort.size.width = self.proposedViewSize.width*self.clipScale;
     viewPort.size.height = self.proposedViewSize.height*self.clipScale;
     
@@ -585,7 +594,7 @@
            context:(CGContextRef)context
 {
     [self _drawInRect:rect
-              context:context
+              context:context 
                 error:nil];
 }
 
@@ -600,16 +609,10 @@
             
             [self _beginDraw:rect];
             
-            // scale the whole drawing context, but first, we need
-            // to translate the context so its centered
-            CGFloat tX = round(rect.size.width/2-(self.viewBox.size.width/2)*self.scale);
-            CGFloat tY = round(rect.size.height/2-(self.viewBox.size.height/2)*self.scale);
-            
             // we also need to calculate the viewport so we can clip
             // the drawing if needed
             BOOL canDraw = NO;
-            NSRect viewPort = [self computeRectDrawingInRect:rect
-                                                     isValid:&canDraw];
+            NSRect viewPort = [self computeRectDrawingInRect:rect isValid:&canDraw];
             // check the viewport
             if( !canDraw ) {
                 if( error != NULL ) {
@@ -617,16 +620,22 @@
                                                          code:IJSVGErrorDrawing
                                                      userInfo:nil];
                 }
+                CGContextRestoreGState(ref);
                 return NO;
             }
             
             // clip to mask
-            CGContextClipToRect( ref, viewPort);
+            if(self.clipToViewport == YES) {
+                CGContextClipToRect( ref, viewPort);
+            }
             
-            tX -= (self.viewBox.origin.x*self.scale);
-            tY -= (self.viewBox.origin.y*self.scale);
+            // add the origin back onto the viewport
+            viewPort.origin.x -= round((_viewBox.origin.x)*_scale);
+            viewPort.origin.y -= round((_viewBox.origin.y)*_scale);
+            viewPort = CGRectIntegral(viewPort);
             
-            CGContextTranslateCTM( ref, tX, tY );
+            // transforms
+            CGContextTranslateCTM( ref, viewPort.origin.x, viewPort.origin.y);
             CGContextScaleCTM( ref, self.scale, self.scale );
             
             // render the layer, its really important we lock
@@ -639,7 +648,27 @@
             }
             
             // render the layers
-            [self.layer renderInContext:ref];
+            switch(self.renderingEngine) {
+                // CoreGraphics / Quartz
+                case IJSVGRenderingEngineCoreGraphics: {
+                    if(self.quartzRenderer == nil) {
+                        // init the renderer if its not already defined
+                        self.quartzRenderer = [[IJSVGQuartzRenderer alloc] init];
+                    }
+                    self.quartzRenderer.scale = self.scale;
+                    self.quartzRenderer.backingScale = self.backingScale;
+                    self.quartzRenderer.viewPort = viewPort;
+                    
+                    // render it
+                    [self.quartzRenderer renderLayer:self.layer
+                                       inContext:ref];
+                    break;
+                }
+                // CALayer tree
+                case IJSVGRenderingEngineCoreAnimation: {
+                    [self.layer renderInContext:ref];
+                }
+            }
             IJSVGEndTransactionLock();
         }
         @catch (NSException *exception) {
@@ -672,8 +701,9 @@
     
     // walk the tree
     void (^block)(CALayer * layer, BOOL isMask) = ^void (CALayer * layer, BOOL isMask) {
-        if(((IJSVGLayer *)layer).requiresBackingScaleHelp == YES) {
-            ((IJSVGLayer *)layer).backingScaleFactor = scale;
+        IJSVGLayer * propLayer = ((IJSVGLayer *)layer);
+        if(propLayer.requiresBackingScaleHelp == YES) {
+            propLayer.backingScaleFactor = scale;
         }
     };
     

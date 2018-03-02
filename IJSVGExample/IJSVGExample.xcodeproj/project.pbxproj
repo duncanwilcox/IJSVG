@@ -175,6 +175,9 @@
 		AE57F07F200E57310051420C /* IJSVGMath.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E8ABF81E219C860032A80C /* IJSVGMath.m */; };
 		AE57F080200E57310051420C /* IJSVGStrokeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 597046A11E24352700A60138 /* IJSVGStrokeLayer.m */; };
 		AE57F081200E57310051420C /* IJSVGUnitLength.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E0F5EC1E29964700F757F7 /* IJSVGUnitLength.m */; };
+		AEBAA78320496D000008B16D /* IJSVGQuartzRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = AEBAA78120496D000008B16D /* IJSVGQuartzRenderer.m */; };
+		AEBAA78420496D000008B16D /* IJSVGQuartzRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = AEBAA78120496D000008B16D /* IJSVGQuartzRenderer.m */; };
+		AEBAA78520496D000008B16D /* IJSVGQuartzRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = AEBAA78120496D000008B16D /* IJSVGQuartzRenderer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -337,6 +340,8 @@
 		AE57F042200D66AD0051420C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		AE57F048200E4FAA0051420C /* wk_svg_to_png */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = wk_svg_to_png; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE57F04A200E4FAA0051420C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		AEBAA78120496D000008B16D /* IJSVGQuartzRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJSVGQuartzRenderer.m; sourceTree = "<group>"; };
+		AEBAA78220496D000008B16D /* IJSVGQuartzRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IJSVGQuartzRenderer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -380,8 +385,8 @@
 				5956658D19B62F4700D805FF /* IJSVGExampleTests */,
 				AE57F0012008218C0051420C /* svg_to_png */,
 				AE57F049200E4FAA0051420C /* wk_svg_to_png */,
-				5956657819B62F4600D805FF /* Products */,
 				AE57F041200D66AD0051420C /* Frameworks */,
+				5956657819B62F4600D805FF /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -559,6 +564,8 @@
 				597046A11E24352700A60138 /* IJSVGStrokeLayer.m */,
 				59E0F5EB1E29964700F757F7 /* IJSVGUnitLength.h */,
 				59E0F5EC1E29964700F757F7 /* IJSVGUnitLength.m */,
+				AEBAA78220496D000008B16D /* IJSVGQuartzRenderer.h */,
+				AEBAA78120496D000008B16D /* IJSVGQuartzRenderer.m */,
 			);
 			name = source;
 			path = ../../source;
@@ -748,6 +755,7 @@
 				599465DE1C4AA87200A2EEF3 /* IJSVGStyleSheetSelector.m in Sources */,
 				5948DED61BB2BFE5004156FF /* IJSVGWriter.m in Sources */,
 				599465DD1C4AA87200A2EEF3 /* IJSVGStyleSheetRule.m in Sources */,
+				AEBAA78320496D000008B16D /* IJSVGQuartzRenderer.m in Sources */,
 				59E2645619BA240D008A6FDB /* IJSVGCommandArc.m in Sources */,
 				59E8ABF91E219C860032A80C /* IJSVGMath.m in Sources */,
 				343A19181FB2212C000652A2 /* IJSVGGradientUnitLength.m in Sources */,
@@ -830,6 +838,7 @@
 				AE57F0102008220D0051420C /* IJSVGWriter.m in Sources */,
 				AE57F007200821E40051420C /* IJSVGTransaction.m in Sources */,
 				AE57F0152008220D0051420C /* IJSVGCommand.m in Sources */,
+				AEBAA78420496D000008B16D /* IJSVGQuartzRenderer.m in Sources */,
 				AE57F0372008220D0051420C /* IJSVGStrokeLayer.m in Sources */,
 				AE57F0332008220D0051420C /* IJSVGShapeLayer.m in Sources */,
 				AE57F0142008220D0051420C /* IJSVGColor.m in Sources */,
@@ -888,6 +897,7 @@
 				AE57F059200E57310051420C /* IJSVGWriter.m in Sources */,
 				AE57F050200E57310051420C /* IJSVGTransaction.m in Sources */,
 				AE57F05E200E57310051420C /* IJSVGCommand.m in Sources */,
+				AEBAA78520496D000008B16D /* IJSVGQuartzRenderer.m in Sources */,
 				AE57F080200E57310051420C /* IJSVGStrokeLayer.m in Sources */,
 				AE57F07C200E57310051420C /* IJSVGShapeLayer.m in Sources */,
 				AE57F05D200E57310051420C /* IJSVGColor.m in Sources */,

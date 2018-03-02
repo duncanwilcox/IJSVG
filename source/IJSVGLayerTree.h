@@ -23,6 +23,4 @@
 
 - (IJSVGLayer *)layerForNode:(IJSVGNode *)node;
 
-+ (void)debug:(IJSVGLayer *)rootLayer;
-
 @end

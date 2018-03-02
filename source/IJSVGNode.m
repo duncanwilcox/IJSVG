@@ -8,6 +8,7 @@
 
 #import "IJSVGNode.h"
 #import "IJSVGDef.h"
+#import "IJSVGUtils.h"
 #import "IJSVGGradient.h"
 #import "IJSVGPattern.h"
 #import "IJSVGGroup.h"
@@ -71,8 +72,12 @@
     if([string isEqualToString:@"tspan"] || kind == NSXMLTextKind) {
         return IJSVGNodeTypeTextSpan;
     }
-    if([string isEqualToString:@"a"])
-        return IJSVGNodeTypeA;
+    
+    // are we commong HTML? - if so just treat as a group
+    if(IJSVGIsCommonHTMLElementName(string) == YES) {
+        return IJSVGNodeTypeGroup;
+    }
+    
     return IJSVGNodeTypeNotFound;
 }
 

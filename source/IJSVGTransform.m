@@ -27,6 +27,22 @@
     return trans;
 }
 
+NSString * IJSVGDebugAffineTransform(CGAffineTransform transform)
+{
+    NSMutableArray * strings = [[NSMutableArray alloc] init];
+    [strings addObjectsFromArray:[IJSVGTransform affineTransformToSVGTransformAttributeString:transform]];
+    return [strings componentsJoinedByString:@" "];
+}
+
+NSString * IJSVGDebugTransforms(NSArray<IJSVGTransform *> * transforms)
+{
+    NSMutableArray * strings = [[NSMutableArray alloc] init];
+    IJSVGApplyTransform(transforms, ^(IJSVGTransform *transform) {
+        [strings addObjectsFromArray:[IJSVGTransform affineTransformToSVGTransformAttributeString:transform.CGAffineTransform]];
+    });
+    return [strings componentsJoinedByString:@" "];
+}
+
 CGAffineTransform IJSVGConcatTransforms(NSArray<IJSVGTransform *> * transforms)
 {
     __block CGAffineTransform trans = CGAffineTransformIdentity;
@@ -430,6 +446,13 @@ void IJSVGApplyTransform(NSArray<IJSVGTransform *> * transforms,  IJSVGTransform
     return [self transformsForString:[strings componentsJoinedByString:@" "]];
 }
 
++ (NSString *)affineTransformToSVGMatrixString:(CGAffineTransform)transform
+{
+    return [NSString stringWithFormat:@"matrix(%g,%g,%g,%g,%g,%g)",
+            transform.a, transform.b, transform.c, transform.d,
+            transform.tx, transform.ty];
+}
+
 // this is an Object-C version of the matrixToTransform method from SVGO
 + (NSArray<NSString *> *)affineTransformToSVGTransformAttributeString:(CGAffineTransform)affineTransform
 {
@@ -528,6 +551,12 @@ void IJSVGApplyTransform(NSArray<IJSVGTransform *> * transforms,  IJSVGTransform
     }
     
     return trans;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ %@",[super description],
+            [self.class affineTransformToSVGTransformAttributeString:self.CGAffineTransform]];
 }
 
 

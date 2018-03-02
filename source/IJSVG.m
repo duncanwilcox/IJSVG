@@ -1,5 +1,5 @@
 //
-//  IJSVGImage.m
+//  IJSVG.m
 //  IconJar
 //
 //  Created by Curtis Hard on 30/08/2014.
@@ -218,13 +218,10 @@
                     error:(NSError **)error
                  delegate:(id<IJSVGDelegate>)delegate
 {
-#ifndef __clang_analyzer__
-    
     // check the cache first
     if( useCache && [IJSVGCache enabled] ) {
         IJSVG * svg = nil;
         if( ( svg = [IJSVGCache cachedSVGForFileURL:aURL] ) != nil ) {
-            // have to release, as this was called from an alloc..!
             return svg;
         }
     }
@@ -262,7 +259,7 @@
         }
         
     }
-#endif
+
     return self;
 }
 
@@ -351,6 +348,11 @@
     self.respondsTo_shouldHandleForeignObject = [self.delegate respondsToSelector:@selector(svg:shouldHandleForeignObject:)];
     self.respondsTo_handleForeignObject = [self.delegate respondsToSelector:@selector(svg:handleForeignObject:document:)];
     self.respondsTo_shouldHandleSubSVG = [self.delegate respondsToSelector:@selector(svg:foundSubSVG:withSVGString:)];
+}
+
+- (IJSVGGroup *)rootNode
+{
+    return self.group;
 }
 
 - (BOOL)isFont
@@ -594,7 +596,7 @@
            context:(CGContextRef)context
 {
     [self _drawInRect:rect
-              context:context 
+              context:context
                 error:nil];
 }
 
@@ -620,7 +622,6 @@
                                                          code:IJSVGErrorDrawing
                                                      userInfo:nil];
                 }
-                CGContextRestoreGState(ref);
                 return NO;
             }
             
@@ -751,6 +752,7 @@
     // force rebuild of the tree
     IJSVGBeginTransactionLock();
     self.layerTree = [tree layerForNode:self.group];
+    
     IJSVGEndTransactionLock();
     return self.layerTree;
 }

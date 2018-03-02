@@ -613,17 +613,22 @@
          // sub SVG
         case IJSVGNodeTypeSVG: {
             
-            IJSVGPath * path = [[IJSVGPath alloc] init];
+            IJSVGGroup * path = [[IJSVGGroup alloc] init];
             path.type = aType;
             path.name = subName;
-            path.parentNode = parentGroup;
-            
+
             // grab common attributes
             [self _setupDefaultsForNode:path];
             [self _parseElementForCommonAttributes:element
                                               node:path
                                   ignoreAttributes:nil];
-                        
+
+            // if its a sub svg, we can remove the attributes for x and y
+            // this is required or it could go out of bounds before the exporter
+            // hits the layers from the groups :)
+            [element removeAttributeForName:@"x"];
+            [element removeAttributeForName:@"y"];
+
             // work out the SVG
             NSError * error = nil;
             NSString * SVGString = element.XMLString;

@@ -55,19 +55,36 @@
     
     // create the new layer
     layer = [self applyTransforms:node.transforms
-                          toLayer:layer];
+                          toLayer:layer
+                         fromNode:node];
     
     return layer;
 }
 
 - (IJSVGLayer *)applyTransforms:(NSArray<IJSVGTransform *> *)transforms
                         toLayer:(IJSVGLayer *)layer
+                       fromNode:(IJSVGNode *)node
 
 {
+    // any x and y?
+    CGFloat x = [node.x computeValue:layer.frame.size.width];
+    CGFloat y = [node.y computeValue:layer.frame.size.height];
     
     // do some magic transform
-    if(transforms.count == 0) {
+    if(transforms.count == 0 && x == 0.f && y == 0.f) {
         return layer;
+    }
+    
+    if(x != 0.f || y != 0.f) {
+        // we must add translate to the stack
+        NSMutableArray * trans = nil;
+        if(transforms != nil) {
+            trans = [transforms mutableCopy];
+        } else {
+            trans = [[NSMutableArray alloc] initWithCapacity:1];
+        }
+        [trans addObject:[IJSVGTransform transformByTranslatingX:x y:y]];
+        transforms = trans;
     }
     
     // add any transforms
@@ -116,16 +133,11 @@
     if(node.shouldRender == NO) {
         layer.hidden = YES;
     }
-    
-    CGRect frame = layer.frame;
-    frame.origin.x += [node.x computeValue:frame.size.width];
-    frame.origin.y += [node.y computeValue:frame.size.height];
-    layer.frame = frame;
 }
 
 - (IJSVGLayer *)layerForImage:(IJSVGImage *)image
 {
-    IJSVGImageLayer * layer = [[IJSVGImageLayer alloc] initWithCGImage:(id)(image.CGImage)];
+    IJSVGImageLayer * layer = [[IJSVGImageLayer alloc] initWithCGImage:image.CGImage];
     layer.affineTransform = CGAffineTransformConcat(layer.affineTransform,
                                                     CGAffineTransformMakeScale( 1.f, -1.f));
     
@@ -141,6 +153,12 @@
 
 - (IJSVGLayer *)layerForGroup:(IJSVGGroup *)group
 {
+    
+    // grab the sub layer tree from the SVG
+    if(group.svg != nil) {
+        return [self layerForGroup:group.svg.rootNode];
+    }
+    
     IJSVGGroupLayer * groupLayer = [[IJSVGGroupLayer alloc] init];
     for(IJSVGNode * node in group.children) {
         [groupLayer addSublayer:[self layerForNode:node]];
@@ -240,13 +258,7 @@
 
 - (IJSVGLayer *)layerForPath:(IJSVGPath *)path
 {
-    // is there a sub SVG?
-    if(path.svg != nil) {
-        // grab the sub layer tree from the SVG
-        return [path.svg layerWithTree:self];
-    }
-    
-    // garb the basic shape layer
+    // grab the basic shape layer
     CGRect originalShapeBounds;
     IJSVGShapeLayer * layer = [self basicLayerForPath:path
                                   originalBoundingBox:&originalShapeBounds];

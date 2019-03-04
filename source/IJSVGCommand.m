@@ -9,13 +9,22 @@
 #import "IJSVGCommand.h"
 #import "IJSVGUtils.h"
 
+#import "IJSVGCommandArc.h"
+#import "IJSVGCommandMove.h"
+#import "IJSVGCommandClose.h"
+#import "IJSVGCommandCurve.h"
+#import "IJSVGCommandLineTo.h"
+#import "IJSVGCommandVerticalLine.h"
+#import "IJSVGCommandHorizontalLine.h"
+#import "IJSVGCommandSmoothCurve.h"
+#import "IJSVGCommandQuadraticCurve.h"
+#import "IJSVGCommandCommandSmoothQuadraticCurve.h"
+
 @interface IJSVGCommand ()
 @property (nonatomic, assign) NSInteger currentIndex;
 @end
 
 @implementation IJSVGCommand
-
-static NSMutableDictionary * _classes = nil;
 
 - (void)dealloc
 {
@@ -28,10 +37,9 @@ static NSMutableDictionary * _classes = nil;
     {
         // work out the basics
         self.currentIndex = 0;
-        self.subCommands = [[NSMutableArray alloc] init];
         self.command = [[str substringToIndex:1] copy];
         self.type = [IJSVGUtils typeForCommandString:self.command];
-        self.commandClass = [[self class] commandClassForCommandLetter:self.command];
+        self.commandClass = [[self class] commandClassForCommandChar:[self.command characterAtIndex:0]];
         NSInteger cnt = 0;
         self.parameters = [IJSVGUtils commandParameters:str count:&cnt];
         self.parameterCount = cnt;
@@ -45,6 +53,8 @@ static NSMutableDictionary * _classes = nil;
         if( self.requiredParameters != 0 ) {
             sets = self.parameterCount/self.requiredParameters;
         }
+        
+        self.subCommands = [[NSMutableArray alloc] initWithCapacity:sets];
         
         // interate over the sets
         for( NSInteger i = 0; i < sets; i++ ) {
@@ -80,33 +90,22 @@ static NSMutableDictionary * _classes = nil;
     return NSMakePoint( pairs[index*2], pairs[index*2+1]);
 }
 
-+ (void)registerClass:(Class)aClass
-           forCommand:(NSString *)command
++ (Class<IJSVGCommandProtocol>)commandClassForCommandChar:(char)aChar
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _classes = [[NSMutableDictionary alloc] init];
-    });
-    [_classes setObject:NSStringFromClass(aClass)
-                 forKey:command];
-}
-
-+ (NSDictionary *)registeredCommandClasses
-{
-    return _classes;
-}
-
-+ (void)load
-{
-    // register here...
-}
-
-+ (Class<IJSVGCommandProtocol>)commandClassForCommandLetter:(NSString *)str
-{
-    NSString * command = nil;
-    if( ( command = [_classes objectForKey:[str lowercaseString]] ) == nil )
-        return nil;
-    return NSClassFromString(command);
+    aChar = tolower(aChar);
+    switch(aChar) {
+        case 'a': return IJSVGCommandArc.class;
+        case 'c': return IJSVGCommandCurve.class;
+        case 'h': return IJSVGCommandHorizontalLine.class;
+        case 'l': return IJSVGCommandLineTo.class;
+        case 'm': return IJSVGCommandMove.class;
+        case 'q': return IJSVGCommandQuadraticCurve.class;
+        case 's': return IJSVGCommandSmoothCurve.class;
+        case 't': return IJSVGCommandCommandSmoothQuadraticCurve.class;
+        case 'v': return IJSVGCommandVerticalLine.class;
+        case 'z': return IJSVGCommandClose.class;
+    }
+    return nil;
 }
 
 - (CGFloat)readFloat

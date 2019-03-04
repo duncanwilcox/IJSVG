@@ -10,6 +10,7 @@
 #import "IJSVGCache.h"
 #import "IJSVGTransaction.h"
 #import "IJSVGExporter.h"
+#import "IJSVGQuartzRenderer.h"
 
 @interface IJSVG ()
 @property (nonatomic, strong) IJSVGParser *group;
@@ -407,7 +408,12 @@
 {
     NSImage * im = [[NSImage alloc] initWithSize:aSize];
     [im lockFocus];
-    CGContextRef ref = [[NSGraphicsContext currentContext] graphicsPort];
+    CGContextRef ref;
+    if(@available(macOS 10.14, *)) {
+        ref = [[NSGraphicsContext currentContext] CGContext];
+    } else {
+        ref = [[NSGraphicsContext currentContext] graphicsPort];
+    }
     CGContextSaveGState(ref);
     if(flipped) {
         CGContextTranslateCTM(ref, 0.f, aSize.height);
@@ -552,8 +558,15 @@
 - (BOOL)drawInRect:(NSRect)rect
              error:(NSError **)error
 {
+    CGContextRef ref;
+    if(@available(macOS 10.14, *)) {
+        ref = [[NSGraphicsContext currentContext] CGContext];
+    } else {
+        ref = [[NSGraphicsContext currentContext] graphicsPort];
+    }
+
     return [self _drawInRect:rect
-                     context:[[NSGraphicsContext currentContext] graphicsPort]
+                     context:ref
                        error:error];
 }
 
@@ -616,72 +629,70 @@
             BOOL canDraw = NO;
             NSRect viewPort = [self computeRectDrawingInRect:rect isValid:&canDraw];
             // check the viewport
-            if( !canDraw ) {
+            if( canDraw == NO ) {
                 if( error != NULL ) {
                     *error = [[NSError alloc] initWithDomain:IJSVGErrorDomain
                                                          code:IJSVGErrorDrawing
                                                      userInfo:nil];
                 }
-                return NO;
-            }
+            } else {
+                // clip to mask
+                if(self.clipToViewport == YES) {
+                    CGContextClipToRect( ref, viewPort);
+                }
             
-            // clip to mask
-            if(self.clipToViewport == YES) {
-                CGContextClipToRect( ref, viewPort);
-            }
-            
-            // add the origin back onto the viewport
-            viewPort.origin.x -= round((_viewBox.origin.x)*_scale);
-            viewPort.origin.y -= round((_viewBox.origin.y)*_scale);
-            viewPort = CGRectIntegral(viewPort);
-            
-            // transforms
-            CGContextTranslateCTM( ref, viewPort.origin.x, viewPort.origin.y);
-            CGContextScaleCTM( ref, self.scale, self.scale );
-            
-            // render the layer, its really important we lock
-            // the transaction when drawing
-            IJSVGBeginTransactionLock();
-            // do we need to update the backing scales on the
-            // layers?
-            if(self.renderingBackingScaleHelper != nil) {
-                [self _askHelperForBackingScale];
-            }
-            
-            // render the layers
-            switch(self.renderingEngine) {
-                // CoreGraphics / Quartz
-                case IJSVGRenderingEngineCoreGraphics: {
-                    if(self.quartzRenderer == nil) {
-                        // init the renderer if its not already defined
-                        self.quartzRenderer = [[IJSVGQuartzRenderer alloc] init];
+                // add the origin back onto the viewport
+                viewPort.origin.x -= round((_viewBox.origin.x)*_scale);
+                viewPort.origin.y -= round((_viewBox.origin.y)*_scale);
+                viewPort = CGRectIntegral(viewPort);
+                
+                // transforms
+                CGContextTranslateCTM( ref, viewPort.origin.x, viewPort.origin.y);
+                CGContextScaleCTM( ref, self.scale, self.scale );
+                
+                // render the layer, its really important we lock
+                // the transaction when drawing
+                IJSVGBeginTransactionLock();
+                // do we need to update the backing scales on the
+                // layers?
+                if(self.renderingBackingScaleHelper != nil) {
+                    [self _askHelperForBackingScale];
+                }
+                
+                // render the layers
+                switch(self.renderingEngine) {
+                    // CoreGraphics / Quartz
+                    case IJSVGRenderingEngineCoreGraphics: {
+                        if(self.quartzRenderer == nil) {
+                            // init the renderer if its not already defined
+                            self.quartzRenderer = [[IJSVGQuartzRenderer alloc] init];
+                        }
+                        self.quartzRenderer.scale = self.scale;
+                        self.quartzRenderer.backingScale = self.backingScale;
+                        self.quartzRenderer.viewPort = viewPort;
+                        
+                        // render it
+                        [self.quartzRenderer renderLayer:self.layer
+                                           inContext:ref];
+                        break;
                     }
-                    self.quartzRenderer.scale = self.scale;
-                    self.quartzRenderer.backingScale = self.backingScale;
-                    self.quartzRenderer.viewPort = viewPort;
-                    
-                    // render it
-                    [self.quartzRenderer renderLayer:self.layer
-                                       inContext:ref];
-                    break;
+                    // CALayer tree
+                    case IJSVGRenderingEngineCoreAnimation: {
+                        [self.layer renderInContext:ref];
+                    }
                 }
-                // CALayer tree
-                case IJSVGRenderingEngineCoreAnimation: {
-                    [self.layer renderInContext:ref];
-                }
+                IJSVGEndTransactionLock();
             }
-            IJSVGEndTransactionLock();
         }
         @catch (NSException *exception) {
             // just catch and give back a drawing error to the caller
-            if( error != NULL )
+            if( error != NULL ) {
                 *error = [[NSError alloc] initWithDomain:IJSVGErrorDomain
                                                      code:IJSVGErrorDrawing
                                                  userInfo:nil];
+            }
         }
-        @finally {
-            CGContextRestoreGState(ref);
-        }
+        CGContextRestoreGState(ref);
     }
     return (error == nil);
 }

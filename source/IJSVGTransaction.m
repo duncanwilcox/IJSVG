@@ -11,7 +11,6 @@
 
 void IJSVGBeginTransactionLock() {
     [CATransaction begin];
-    [CATransaction lock];
     if(@available(macOS 10.14, *)) {} else {
         [CATransaction lock];
     }

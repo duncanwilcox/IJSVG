@@ -17,13 +17,13 @@
 
 @implementation IJSVGLayer
 
-- (void)dealloc
-{
-    IJSVGBeginTransactionLock();
-    self.maskingLayerInternal = nil;
-    IJSVGEndTransactionLock();
-}
-
+//- (void)dealloc
+//{
+//    IJSVGBeginTransactionLock();
+//    self.maskingLayerInternal = nil;
+//    IJSVGEndTransactionLock();
+//}
+//
 + (NSArray *)deepestSublayersOfLayer:(CALayer *)layer
 {
     NSMutableArray * arr = [[NSMutableArray alloc] init];
@@ -56,7 +56,8 @@
     }
 }
 
-- (void)addSublayer:(CALayer *)layer {
+- (void)addSublayer:(CALayer *)layer
+{
     if([layer isKindOfClass:[IJSVGLayer class]] == NO && 
        [layer isKindOfClass:[IJSVGShapeLayer class]] == NO) { 
         NSString * r = [NSString stringWithFormat:@"The layer must be an instance of IJSVGLayer, %@ given.", 
@@ -167,6 +168,11 @@
         return; 
     } 
     [self _customRenderInContext:ctx]; 
+}
+
+- (id<CAAction>)actionForKey:(NSString *)event
+{
+    return nil;
 }
 
 @end

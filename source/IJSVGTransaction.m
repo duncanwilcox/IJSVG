@@ -10,6 +10,9 @@
 #import <QuartzCore/QuartzCore.h>
 
 void IJSVGBeginTransactionLock() {
+    if(NSThread.isMainThread == YES) {
+        return;
+    }
     [CATransaction begin];
     if(@available(macOS 10.14, *)) {} else {
         [CATransaction lock];
@@ -18,6 +21,9 @@ void IJSVGBeginTransactionLock() {
 };
 
 void IJSVGEndTransactionLock() {
+    if(NSThread.isMainThread == YES) {
+        return;
+    }
     if(@available(macOS 10.14, *)) {} else {
         [CATransaction unlock];
     }

@@ -10,7 +10,6 @@
 #import "IJSVGCache.h"
 #import "IJSVGTransaction.h"
 #import "IJSVGExporter.h"
-#import "IJSVGQuartzRenderer.h"
 
 @interface IJSVG ()
 @property (nonatomic, strong) IJSVGParser *group;
@@ -21,6 +20,7 @@
 @property (nonatomic, assign) CGRect viewBox;
 @property (nonatomic, assign) CGSize proposedViewSize;
 @property (nonatomic, assign) CGFloat lastProposedBackingScale;
+@property (nonatomic, assign) IJSVGRenderQuality lastProposedRenderQuality;
 @property (nonatomic, assign) CGFloat backingScale;
 @property (nonatomic, strong) NSMutableDictionary *replacementColorsInternal;
 @property (nonatomic, strong) IJSVGQuartzRenderer * quartzRenderer;
@@ -329,9 +329,9 @@
 
 - (void)_setupBasicsFromAnyInitializer
 {
-    self.renderingEngine = IJSVGRenderingEngineCoreAnimation;
     self.clipToViewport = YES;
-    
+    self.renderQuality = IJSVGRenderQualityOptimized;
+
     // setup low level backing scale
     self.lastProposedBackingScale = 0.f;
     self.renderingBackingScaleHelper = ^CGFloat{
@@ -659,28 +659,23 @@
                     [self _askHelperForBackingScale];
                 }
                 
-                // render the layers
-                switch(self.renderingEngine) {
-                    // CoreGraphics / Quartz
-                    case IJSVGRenderingEngineCoreGraphics: {
-                        if(self.quartzRenderer == nil) {
-                            // init the renderer if its not already defined
-                            self.quartzRenderer = [[IJSVGQuartzRenderer alloc] init];
-                        }
-                        self.quartzRenderer.scale = self.scale;
-                        self.quartzRenderer.backingScale = self.backingScale;
-                        self.quartzRenderer.viewPort = viewPort;
-                        
-                        // render it
-                        [self.quartzRenderer renderLayer:self.layer
-                                           inContext:ref];
+                CGInterpolationQuality quality;
+                switch(self.renderQuality) {
+                    case IJSVGRenderQualityLow: {
+                        quality = kCGInterpolationLow;
                         break;
                     }
-                    // CALayer tree
-                    case IJSVGRenderingEngineCoreAnimation: {
-                        [self.layer renderInContext:ref];
+                    case IJSVGRenderQualityOptimized: {
+                        quality = kCGInterpolationMedium;
+                        break;
+                    }
+                    default: {
+                        quality = kCGInterpolationHigh;
                     }
                 }
+                CGContextSetInterpolationQuality(ref, quality);
+
+                [self.layer renderInContext:ref];
                 IJSVGEndTransactionLock();
             }
         }
@@ -706,14 +701,18 @@
     
     // dont do anything, nothing has changed, no point of iterating over
     // every layer for no reason!
-    if(scale == self.lastProposedBackingScale) {
+    if(scale == self.lastProposedBackingScale && self.renderQuality == self.lastProposedRenderQuality) {
         return;
     }
+
+    IJSVGRenderQuality quality = self.renderQuality;
     self.lastProposedBackingScale = scale;
-    
+    self.lastProposedRenderQuality = quality;
+
     // walk the tree
     void (^block)(CALayer * layer, BOOL isMask) = ^void (CALayer * layer, BOOL isMask) {
         IJSVGLayer * propLayer = ((IJSVGLayer *)layer);
+        propLayer.renderQuality = quality;
         if(propLayer.requiresBackingScaleHelp == YES) {
             propLayer.backingScaleFactor = scale;
         }
@@ -796,17 +795,19 @@
     
     // block to find colors in stroke and fill
     void (^block)(CALayer * layer, BOOL isMask) = ^void (CALayer * layer, BOOL isMask) {
-        if([layer isKindOfClass:[IJSVGShapeLayer class]] && isMask == NO) {
+        if([layer isKindOfClass:[IJSVGShapeLayer class]] && isMask == NO && layer.isHidden == NO) {
             IJSVGShapeLayer * sLayer = (IJSVGShapeLayer *)layer;
             NSColor * color = nil;
             if(sLayer.fillColor != nil) {
                 color = [NSColor colorWithCGColor:sLayer.fillColor];
+                color = [IJSVGColor computeColorSpace:color];
                 if(color.alphaComponent != 0.f) {
                     [colors addObject:color];
                 }
             }
             if(sLayer.strokeColor != nil) {
                 color = [NSColor colorWithCGColor:sLayer.strokeColor];
+                color = [IJSVGColor computeColorSpace:color];
                 if(color.alphaComponent != 0.f) {
                     [colors addObject:color];
                 }

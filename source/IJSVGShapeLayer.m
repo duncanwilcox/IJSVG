@@ -15,13 +15,13 @@
 
 @implementation IJSVGShapeLayer
 
-- (void)dealloc
-{
-    IJSVGBeginTransactionLock();
-    self.maskingLayerInternal = nil;
-    IJSVGEndTransactionLock();
-}
-
+//- (void)dealloc
+//{
+//    IJSVGBeginTransactionLock();
+//    self.maskingLayerInternal = nil;
+//    IJSVGEndTransactionLock();
+//}
+//
 - (void)addSublayer:(CALayer *)layer {
     if([layer isKindOfClass:[IJSVGLayer class]] == NO &&
        [layer isKindOfClass:[IJSVGShapeLayer class]] == NO) {
@@ -145,6 +145,11 @@
         pLayer = pLayer.superlayer;
     }
     return point;
+}
+
+- (id<CAAction>)actionForKey:(NSString *)event
+{
+    return nil;
 }
 
 @end

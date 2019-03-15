@@ -297,9 +297,6 @@
         // only use the global if its set and the current colors
         // alpha channel is not 0.f, otherwise its a blank clear color,
         // aka, not filled in
-        
-        
-        
         NSColor * fColor = path.fillColor;
         BOOL hasColor = (fColor.alphaComponent == 0.f || fColor == nil) == NO;
         BOOL hasFill = path.fillPattern != nil || path.fillGradient != nil;
@@ -482,6 +479,7 @@
     if(path.fillOpacity.value != 0.f) {
         gradLayer.opacity = path.fillOpacity.value;
     }
+    gradLayer.masksToBounds = YES;
     return gradLayer;
 }
 
@@ -503,9 +501,11 @@
     CGRect bounds = CGPathGetBoundingBox(layer.path);
     bounds = [self correctBounds:bounds forStrokedPath:path];
     patternLayer.frame = bounds;
+    patternLayer.masksToBounds = YES;
     
     // display
     [patternLayer setNeedsDisplay];
+    patternLayer.masksToBounds = YES;
     
     return patternLayer;
 }
@@ -531,7 +531,6 @@
     
     // display
     [patternLayer setNeedsDisplay];
-    
     return patternLayer;
 }
 

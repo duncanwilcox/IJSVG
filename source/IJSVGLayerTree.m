@@ -315,7 +315,7 @@
             layer.fillColor = fColor.CGColor;
         } else {
             // use default color
-            NSColor * defColor = [NSColor blackColor];
+            NSColor * defColor = [IJSVGColor computeColorSpace:NSColor.blackColor];
             if(path.fillOpacity.value != 1.f) {
                 defColor = [IJSVGColor changeAlphaOnColor:defColor
                                                        to:path.fillOpacity.value];
@@ -340,7 +340,7 @@
             
             // force reset of the mask colour as we need to use the stroke layer
             // as the mask for the stroke gradient
-            strokeLayer.strokeColor = [NSColor blackColor].CGColor;
+            strokeLayer.strokeColor = [IJSVGColor computeColorSpace:NSColor.blackColor].CGColor;
             
             // create the gradient
             IJSVGGradientLayer * gradLayer = [self gradientStrokeLayerForLayer:layer
@@ -360,7 +360,7 @@
         } else if(self.strokeColor == nil && path.strokePattern != nil) {
             
             // force reset of the mask
-            strokeLayer.strokeColor = [NSColor blackColor].CGColor;
+            strokeLayer.strokeColor = [IJSVGColor computeColorSpace:NSColor.blackColor].CGColor;
             
             // create the pattern
             IJSVGPatternLayer * patternLayer = [self patternStrokeLayerForLayer:layer
@@ -590,7 +590,7 @@
     CGFloat lineWidth = 1.f;
     if(self.strokeWidth > 0.f) {
         lineWidth = self.strokeWidth;
-    } else if(path.strokeWidth.value > 0.f) {
+    } else {
         lineWidth = path.strokeWidth.value;
     }
     

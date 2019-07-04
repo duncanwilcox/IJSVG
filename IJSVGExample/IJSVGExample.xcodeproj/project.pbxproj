@@ -71,6 +71,10 @@
 		59E8ABF61E2176340032A80C /* IJSVGGroupLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E8ABF51E2176340032A80C /* IJSVGGroupLayer.m */; };
 		59E8ABF91E219C860032A80C /* IJSVGMath.m in Sources */ = {isa = PBXBuildFile; fileRef = 59E8ABF81E219C860032A80C /* IJSVGMath.m */; };
 		59F799E219B880CE00096CB7 /* htc_one.svg in Resources */ = {isa = PBXBuildFile; fileRef = 59F799E119B880CE00096CB7 /* htc_one.svg */; };
+		AE4F97E522CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */; };
+		AE4F97E622CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */; };
+		AE4F97E722CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */; };
+		AE4F97E822CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */; };
 		AE57F0032008218C0051420C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AE57F0022008218C0051420C /* main.m */; };
 		AE57F007200821E40051420C /* IJSVGTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 59A3DA6C1E283022003E59A9 /* IJSVGTransaction.m */; };
 		AE57F0082008220D0051420C /* IJSVGExporterPathInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 598759F51E242C850024CC3F /* IJSVGExporterPathInstruction.m */; };
@@ -334,6 +338,8 @@
 		59E8ABF71E219C860032A80C /* IJSVGMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IJSVGMath.h; sourceTree = "<group>"; };
 		59E8ABF81E219C860032A80C /* IJSVGMath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IJSVGMath.m; sourceTree = "<group>"; };
 		59F799E119B880CE00096CB7 /* htc_one.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = htc_one.svg; sourceTree = "<group>"; };
+		AE4F97E322CDB6190086B8CB /* IJSVGStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IJSVGStringAdditions.h; sourceTree = "<group>"; };
+		AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IJSVGStringAdditions.m; sourceTree = "<group>"; };
 		AE57F0002008218C0051420C /* svg_to_png */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = svg_to_png; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE57F0022008218C0051420C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AE57F042200D66AD0051420C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -541,6 +547,8 @@
 				59E2644E19BA240D008A6FDB /* IJSVGTransform.m */,
 				59E2644F19BA240D008A6FDB /* IJSVGUtils.h */,
 				59E2645019BA240D008A6FDB /* IJSVGUtils.m */,
+				AE4F97E322CDB6190086B8CB /* IJSVGStringAdditions.h */,
+				AE4F97E422CDB6190086B8CB /* IJSVGStringAdditions.m */,
 				592840AF1E153F3D002F9AF0 /* IJSVGLayerTree.h */,
 				592840B01E153F3D002F9AF0 /* IJSVGLayerTree.m */,
 				592840B21E155308002F9AF0 /* IJSVGGradientLayer.h */,
@@ -699,6 +707,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -785,6 +794,7 @@
 				59E2646219BA240D008A6FDB /* IJSVGGradient.m in Sources */,
 				598759F61E242C850024CC3F /* IJSVGExporterPathInstruction.m in Sources */,
 				59E2645E19BA240D008A6FDB /* IJSVGCommandSmoothCurve.m in Sources */,
+				AE4F97E522CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */,
 				59E2645819BA240D008A6FDB /* IJSVGCommandCommandSmoothQuadraticCurve.m in Sources */,
 				59E2645D19BA240D008A6FDB /* IJSVGCommandQuadraticCurve.m in Sources */,
 				59E2646719BA240D008A6FDB /* IJSVGPath.m in Sources */,
@@ -808,6 +818,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE4F97E622CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */,
 				5956659119B62F4700D805FF /* IJSVGExampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -826,6 +837,7 @@
 				AE57F01D2008220D0051420C /* IJSVGCommandQuadraticCurve.m in Sources */,
 				AE57F0292008220D0051420C /* IJSVGRadialGradient.m in Sources */,
 				AE57F0122008220D0051420C /* IJSVGBezierPathAdditions.m in Sources */,
+				AE4F97E722CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */,
 				AE57F0352008220D0051420C /* IJSVGGroupLayer.m in Sources */,
 				AE57F00D2008220D0051420C /* IJSVGStyleSheetSelector.m in Sources */,
 				AE57F0092008220D0051420C /* IJSVGImage.m in Sources */,
@@ -917,6 +929,7 @@
 				AE57F071200E57310051420C /* IJSVGPath.m in Sources */,
 				AE57F081200E57310051420C /* IJSVGUnitLength.m in Sources */,
 				AE57F061200E57310051420C /* IJSVGCommandCommandSmoothQuadraticCurve.m in Sources */,
+				AE4F97E822CDB6190086B8CB /* IJSVGStringAdditions.m in Sources */,
 				AE57F074200E57310051420C /* IJSVGTransform.m in Sources */,
 				AE57F079200E57310051420C /* IJSVGExporter.m in Sources */,
 				AE57F06E200E57310051420C /* IJSVGLinearGradient.m in Sources */,

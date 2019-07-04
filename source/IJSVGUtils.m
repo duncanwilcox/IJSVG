@@ -217,12 +217,36 @@ CGFloat degrees_to_radians( CGFloat degrees )
     return [string isEqualToString:[string uppercaseString]] ? IJSVGCommandTypeAbsolute : IJSVGCommandTypeRelative;
 }
 
++ (NSRange)rangeOfParentheses:(NSString *)string
+{
+    NSRange range = NSMakeRange(NSNotFound, 0);
+    const char * characters = string.UTF8String;
+    unsigned long length = strlen(characters);
+    for(NSInteger i = 0; i < length; i++) {
+        char c = characters[i];
+        if(c == '(') {
+            range.location = i + 1;
+        } else if(c == ')') {
+            range.length = i - range.location;
+        }
+    }
+    return range;
+}
+
 + (NSString *)defURL:(NSString *)string
 {
+    // insta check for URL
+    NSCharacterSet * set = NSCharacterSet.whitespaceCharacterSet;
+    string = [string stringByTrimmingCharactersInSet:set];
+    NSString * check = [string substringToIndex:3].lowercaseString;
+    if([check isEqualToString:@"url"] == NO) {
+        return nil;
+    }
+
     static NSRegularExpression * _reg = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _reg = [[NSRegularExpression alloc] initWithPattern:@"url\\s?\\(\\s?#(.*?)\\)\\;?"
+        _reg = [[NSRegularExpression alloc] initWithPattern:@"url\\(['\"]?([^)]+?)['\"]?\\)"
                                                     options:0
                                                       error:nil];
     });
@@ -230,11 +254,14 @@ CGFloat degrees_to_radians( CGFloat degrees )
     [_reg enumerateMatchesInString:string
                            options:0
                              range:NSMakeRange( 0, string.length )
-                        usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop)
-     {
+                        usingBlock:^(NSTextCheckingResult *result,
+                                     NSMatchingFlags flags, BOOL *stop) {
          if( ( foundID = [string substringWithRange:[result rangeAtIndex:1]] ) != nil )
              *stop = YES;
      }];
+    if([foundID hasPrefix:@"#"] == YES) {
+        foundID = [foundID substringFromIndex:1];
+    }
     return foundID;
 }
 
@@ -399,7 +426,7 @@ CGFloat degrees_to_radians( CGFloat degrees )
         *count = 1;
         return ret;
     }
-    return [[self class] scanFloatsFromString:command
+    return [self.class scanFloatsFromString:command
                                          size:count];
 }
 
@@ -503,7 +530,7 @@ CGFloat degrees_to_radians( CGFloat degrees )
 + (CGFloat *)parseViewBox:(NSString *)string
 {
     NSInteger size = 0;
-    return [[self class] scanFloatsFromString:string
+    return [self.class scanFloatsFromString:string
                                          size:&size];
 }
 

@@ -39,7 +39,7 @@
         self.currentIndex = 0;
         self.command = [[str substringToIndex:1] copy];
         self.type = [IJSVGUtils typeForCommandString:self.command];
-        self.commandClass = [[self class] commandClassForCommandChar:[self.command characterAtIndex:0]];
+        self.commandClass = [self.class commandClassForCommandChar:[self.command characterAtIndex:0]];
         NSInteger cnt = 0;
         self.parameters = [IJSVGUtils commandParameters:str count:&cnt];
         self.parameterCount = cnt;
@@ -68,7 +68,7 @@
             }
             
             // create a subcommand per set
-            IJSVGCommand * c = [[[self class] alloc] init];
+            IJSVGCommand * c = [[self.class alloc] init];
             c.parameterCount = self.requiredParameters;
             c.parameters = subParams;
             c.type = self.type;

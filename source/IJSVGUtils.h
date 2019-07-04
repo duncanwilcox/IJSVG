@@ -10,6 +10,7 @@
 #include <xlocale.h>
 #import "IJSVGCommand.h"
 #import "IJSVGGradientUnitLength.h"
+#import "IJSVGStringAdditions.h"
 
 @interface IJSVGUtils : NSObject
 
@@ -37,6 +38,7 @@ BOOL IJSVGIsSVGLayer(CALayer * layer);
 + (IJSVGUnitType)unitTypeForString:(NSString *)string;
 + (IJSVGBlendMode)blendModeForString:(NSString *)string;
 + (NSString *)mixBlendingModeForBlendMode:(IJSVGBlendMode)blendMode;
++ (NSRange)rangeOfParentheses:(NSString *)string;
 
 + (void)logParameters:(CGFloat *)param
                 count:(NSInteger)count;

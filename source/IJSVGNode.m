@@ -143,7 +143,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    IJSVGNode * node = [[self class] allocWithZone:zone];
+    IJSVGNode * node = [self.class allocWithZone:zone];
     [node applyPropertiesFromNode:self];
     return node;
 }
@@ -162,7 +162,7 @@
         self.strokeOpacity = [IJSVGUnitLength unitWithFloat:1.f];
         self.strokeOpacity.inherit = YES;
         
-        self.strokeWidth = [IJSVGUnitLength unitWithFloat:0.f];
+        self.strokeWidth = [IJSVGUnitLength unitWithFloat:1.f];
         self.strokeWidth.inherit = YES;
         
         self.windingRule = IJSVGWindingRuleInherit;

@@ -34,14 +34,14 @@
 + (id)svgNamed:(NSString *)string
          error:(NSError **)error
 {
-    return [[self class] svgNamed:string
+    return [self.class svgNamed:string
                             error:error
                          delegate:nil];
 }
 
 + (id)svgNamed:(NSString *)string
 {
-    return [[self class] svgNamed:string
+    return [self.class svgNamed:string
                             error:nil];
 }
 
@@ -49,7 +49,7 @@
       useCache:(BOOL)useCache
       delegate:(id<IJSVGDelegate>)delegate
 {
-    return [[self class] svgNamed:string
+    return [self.class svgNamed:string
                          useCache:useCache
                             error:nil
                          delegate:delegate];
@@ -58,7 +58,7 @@
 + (id)svgNamed:(NSString *)string
       delegate:(id<IJSVGDelegate>)delegate
 {
-    return [[self class] svgNamed:string
+    return [self.class svgNamed:string
                             error:nil
                          delegate:delegate];
 }
@@ -330,7 +330,7 @@
 - (void)_setupBasicsFromAnyInitializer
 {
     self.clipToViewport = YES;
-    self.renderQuality = IJSVGRenderQualityOptimized;
+    self.renderQuality = IJSVGRenderQualityFullResolution;
 
     // setup low level backing scale
     self.lastProposedBackingScale = 0.f;
@@ -402,6 +402,16 @@
                          error:nil];
 }
 
+- (NSRect)computeOriginalDrawingFrameWithSize:(NSSize)aSize
+{
+    [self _beginDraw:(NSRect) {
+        .origin = CGPointZero,
+        .size = aSize
+    }];
+    return NSMakeRect(0.f, 0.f, _proposedViewSize.width * _clipScale,
+                      _proposedViewSize.height * _clipScale);
+}
+
 - (NSImage *)imageWithSize:(NSSize)aSize
                    flipped:(BOOL)flipped
                      error:(NSError **)error
@@ -425,6 +435,16 @@
     CGContextRestoreGState(ref);
     [im unlockFocus];
     return im;
+}
+
+- (NSImage *)imageByMaintainingAspectRatioWithSize:(NSSize)aSize
+                                           flipped:(BOOL)flipped
+                                             error:(NSError **)error
+{
+    NSRect rect = [self computeOriginalDrawingFrameWithSize:aSize];
+    return [self imageWithSize:rect.size
+                       flipped:flipped
+                         error:error];
 }
 
 - (NSData *)PDFData
@@ -699,6 +719,10 @@
         scale = 1.f;
     }
     
+    // make sure we multiple the scale by the scale of the rendered clip
+    // or it will be blurry for gradients and other bitmap drawing
+    scale = (_scale * scale);
+
     // dont do anything, nothing has changed, no point of iterating over
     // every layer for no reason!
     if(scale == self.lastProposedBackingScale && self.renderQuality == self.lastProposedRenderQuality) {

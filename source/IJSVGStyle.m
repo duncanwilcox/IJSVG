@@ -42,7 +42,7 @@
 
 + (IJSVGStyle *)parseStyleString:(NSString *)string
 {
-    IJSVGStyle * style = [[[self class] alloc] init];
+    IJSVGStyle * style = [[self.class alloc] init];
     NSInteger length = string.length;
     NSInteger index = 0;
     NSString * key = nil;
@@ -73,8 +73,8 @@
         
         // set the propery if it actually exists
         if(key != nil && value != nil) {
-            [style setPropertyValue:[[self class] trimString:value]
-                        forProperty:[[self class] trimString:key]];
+            [style setPropertyValue:[self.class trimString:value]
+                        forProperty:[self.class trimString:key]];
             key = nil;
             value = nil;
         }

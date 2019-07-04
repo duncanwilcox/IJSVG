@@ -45,7 +45,7 @@
 
     // compute the color stops and colours
     NSArray * colors = nil;
-    CGFloat * stopsParams = [[self class] computeColorStopsFromString:element
+    CGFloat * stopsParams = [self.class computeColorStopsFromString:element
                                                                colors:&colors];
     
     // create the gradient with the colours
@@ -69,35 +69,29 @@
     CGAffineTransform absTransform = absoluteTransform;
     CGAffineTransform selfTransform = IJSVGConcatTransforms(self.transforms);
     
-#pragma mark User Space On Use
+    CGRect boundingBox = inUserSpace ? viewBox : objectRect;
+    
+    // make sure we apply the absolute position to
+    // transform us back into the correct space
     if(inUserSpace == YES) {
-        CGFloat width = CGRectGetWidth(viewBox);
-        CGFloat height = CGRectGetHeight(viewBox);
-        gradientStartPoint = CGPointMake([self.x1 computeValue:width],
-                                         [self.y1 computeValue:height]);
-        
-        gradientEndPoint = CGPointMake([self.x2 computeValue:width],
-                                       [self.y2 computeValue:height]);
-        
-        // transform absolute - due to user space
         CGContextConcatCTM(ctx, absTransform);
-    } else {
-#pragma mark Object Bounding Box
-        CGFloat width = CGRectGetWidth(objectRect);
-        CGFloat height = CGRectGetHeight(objectRect);
-        gradientStartPoint = CGPointMake([self.x1 computeValue:width],
-                                         [self.y1 computeValue:height]);
-        
-        gradientEndPoint = CGPointMake([self.x2 computeValue:width],
-                                       [self.y2 computeValue:height]);
     }
     
+    CGFloat width = CGRectGetWidth(boundingBox);
+    CGFloat height = CGRectGetHeight(boundingBox);
+    gradientStartPoint = CGPointMake([self.x1 computeValue:width],
+                                     [self.y1 computeValue:height]);
+    
+    gradientEndPoint = CGPointMake([self.x2 computeValue:width],
+                                   [self.y2 computeValue:height]);
+
     // transform the context
     CGContextConcatCTM(ctx, selfTransform);
     
     // draw the gradient
-    CGGradientDrawingOptions options = kCGGradientDrawsBeforeStartLocation|
-    kCGGradientDrawsAfterEndLocation;
+    CGGradientDrawingOptions options =
+        kCGGradientDrawsBeforeStartLocation|
+        kCGGradientDrawsAfterEndLocation;
     
     CGContextDrawLinearGradient(ctx, self.CGGradient, gradientStartPoint,
                                 gradientEndPoint, options);
